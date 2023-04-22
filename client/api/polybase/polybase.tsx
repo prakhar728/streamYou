@@ -1,0 +1,372 @@
+// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import type { NextApiRequest, NextApiResponse } from "next";
+import {
+    Collection,
+    CollectionList,
+    CollectionRecordResponse,
+    Polybase,
+} from "@polybase/client";
+import { ethPersonalSign } from "@polybase/eth";
+import { ethers } from "ethers";
+import { v4 as uuidv4 } from "uuid";
+
+type Data = {
+    response: CollectionList<any> | CollectionRecordResponse<any> | string;
+};
+
+const schema = `
+
+@public
+collection Creator {
+  id: string;
+
+  
+  publicKey: PublicKey;
+
+  name: string; 
+
+  description:string;
+  image:string;
+
+  nftContractAddress:string;
+
+  groupID:string;
+
+  videos?:Video[]
+  
+  constructor (id:string,publicKey:string,name:string,description:string,image:string,nftContractAddress:string,groupID:string) {
+     
+ 
+    if(!ctx.publicKey)
+    {
+      throw error('Need Public Key')
+    }
+    this.id = id;
+    this.publicKey=publicKey;
+    this.name=name;
+    this.description=description;
+    this.image=image;
+    this.nftContractAddress=nftContractAddress;
+    this.groupID=groupID;
+  }
+
+  addVideo(video:Video){
+    if(ctx.publicKey!=this.publicKey)
+    {
+      throw error("Invalid User. Only Owner can upload");
+    }
+    this.videos.push(video)
+  }
+  
+}
+
+@public
+collection Video{
+  id:string;
+
+  title:string;
+
+  description:string;
+
+  thumbnail:string;
+
+  isTokenGated:boolean;
+
+  channelId:string;
+
+  uploadDate:string;
+
+  constructor(id:string,title:string,description:string,thumbnail:string,isTokenGated:boolean,channelId:string,uploadDate:string){
+     this.id = string;
+    this.title=title;
+    this.description=description;
+    this.thumbnail=thumbnail;
+    this.isTokenGated=isTokenGated;
+    this.chanelId=channelId;
+    this.uploadDate=uploadDate;
+  }
+}`
+
+const signInPolybase = () => {
+    const db = new Polybase({
+        defaultNamespace: "streamYou",
+    });
+
+    const wallet = new ethers.Wallet(process.env.PRIVATE_KEY as string);
+
+    // console.log("PRIVATE_KEY", wallet.privateKey);
+
+    db.signer((data) => {
+        return {
+            h: "eth-personal-sign",
+            sig: ethPersonalSign(wallet.privateKey as string, data),
+        };
+    });
+    // console.log(db);
+    return db;
+};
+
+async function handleGet(
+    req: NextApiRequest,
+    res: NextApiResponse<Data>,
+    collection: Collection<any>
+) {
+    const { id } = req.query;
+    if (!id) {
+        const recordData = await collection.get();
+        res.status(200).json({ response: recordData });
+        return;
+    }
+    // Get a record
+    const recordData = await collection.record(id as string).get();
+    res.status(200).json({ response: recordData });
+}
+
+export default async function handler(
+    req: NextApiRequest,
+    res: NextApiResponse<Data>
+) {
+    const db = signInPolybase();
+
+    // Create a collection
+    // const createResponse = await db.applySchema(schema);
+    // console.log(createResponse);
+
+    const body = req.body;
+    const params = req.query;
+
+    //CHECK FOR BODY AND PARAMS
+    if (req.method === "GET") {
+        if (!params || Object.keys(params).length === 0) {
+            res.status(400).json({ response: "Missing query params" });
+            return;
+        }
+    } else if (req.method === "POST" || req.method === "PATCH") {
+        if (!body || Object.keys(body).length === 0) {
+            res.status(400).json({ response: "Missing body" });
+            return;
+        }
+    }
+    
+    if (req.method === "GET") {
+        const { collection } = params;
+        if (!collection) {
+            res.status(400).json({
+                response: "Missing required field 'collection'",
+            });
+            return;
+        }
+        if (collection === "Creator") {
+            const userCollection = db.collection("Creator");
+            await handleGet(req, res, userCollection);
+        } else if (collection === "Videos") {
+            const postsCollection =  db.collection("Video");
+            await handleGet(req, res, postsCollection);
+        } 
+        else{
+            res.status(400).json({ response: "Invalid collection" });
+        }
+        return;
+    } else if (req.method === "POST") {
+        //ID WILL BE THE PUBLIC KEY OF THE CREATOR
+        const { id } = body;
+        if (!id) {
+            res.status(400).json({ response: "Missing required field 'id'" });
+            return;
+        }
+
+        if (req.body.collection === "Creator") {
+            // Create a record
+            const {id,publicKey,name,description,image,nftContractAddress,groupID} = req.body;
+            if(
+                !body.hasOwnProperty("name")||!body.hasOwnProperty("description")||!body.hasOwnProperty("image")||!body.hasOwnProperty("nftContractAddress")||!body.hasOwnProperty("groupID")||!body.hasOwnProperty("id")||!body.hasOwnProperty("publicKey")
+            ){
+                res.status(400).json({response:"Missing Required Fields"});
+            }
+            const response = await db.collection("Creator").create([id,publicKey,name,description,image,nftContractAddress,groupID]);
+            res.status(200).json({ response: response });
+            return;
+        } else if (req.body.collection === "Videos") {
+            const { id,title,description,thumbnail,isTokenGated,channelId,uploadDate,creatorId} = req.body;
+            if (
+                !body.hasOwnProperty("id") ||
+                !body.hasOwnProperty("title")|| !body.hasOwnProperty("description") ||
+                !body.hasOwnProperty("thumbnail")|| !body.hasOwnProperty("isTokenGated") ||
+                !body.hasOwnProperty("channelId")|| !body.hasOwnProperty("iuploadDated") 
+            ) {
+                res.status(400).json({ response: "Missing required fields" });
+                return;
+            }
+            //Create a Video Record
+            const uploadedVideo = await db
+            .collection("Video")
+            .create([id as string, title, description,thumbnail,isTokenGated,channelId,uploadDate]);
+            // Create a record
+            const response = await db
+                .collection("Creator")
+                .record(creatorId)
+                .call("addVideo",[db.collection("Video").record(id)]);
+            res.status(200).json({ response: response });
+        }  else {
+            res.status(400).json({ response: "Invalid collection" });
+            return;
+        }
+        return;
+    } 
+    // else if (req.method === "PATCH") {
+    //     const { id } = body;
+    //     if (!id) {
+    //         res.status(400).json({ response: "Missing required field 'id'" });
+    //         return;
+    //     }
+    //     if (req.body.collection === "Creator") {
+    //         const { name, description } = body;
+    //         if (
+    //             !body.hasOwnProperty("name") ||
+    //             !body.hasOwnProperty("description")
+    //         ) {
+    //             res.status(400).json({ response: "Missing required fields" });
+    //             return;
+    //         }
+    //         const recordData = await db
+    //             .collection("Creator")
+    //             .record(id as string)
+    //             .call("updateRecord", [name, description]);
+    //         res.status(200).json({ response: recordData });
+    //         return;
+    //     } else if (req.body.collection === "Posts") {
+    //         const { media, mediaType } = body;
+    //         if (
+    //             !body.hasOwnProperty("media") ||
+    //             !body.hasOwnProperty("mediaType")
+    //         ) {
+    //             res.status(400).json({ response: "Missing required fields" });
+    //             return;
+    //         }
+    //         const recordData = await db
+    //             .collection("Posts")
+    //             .record(id as string)
+    //             .call("updateRecord", [media, mediaType]);
+    //         res.status(200).json({ response: recordData });
+    //         return;
+    //     } else if (req.body.collection === "MultiSig") {
+    //         const { name, description, owners, threshold, moduleAddress, moduleProposalId } = req.body;
+    //         if (
+    //             body.hasOwnProperty("moduleAddress") &&
+    //             body.hasOwnProperty("moduleProposalId")
+    //         ) {
+    //             const recordData = await db
+    //                 .collection("MultiSig")
+    //                 .record(id as string)
+    //                 .call("addModule", [moduleAddress, moduleProposalId]);
+    //             res.status(200).json({ response: recordData });
+    //             return;
+    //         }
+    //         if (body.hasOwnProperty("threshold")) {
+    //             const recordData = await db
+    //                 .collection("MultiSig")
+    //                 .record(id as string)
+    //                 .call("updateThreshold", [threshold]);
+    //             res.status(200).json({ response: recordData });
+    //             return;
+    //         }
+    //         if (body.hasOwnProperty("owners")) {
+    //             const recordData = await db
+    //                 .collection("MultiSig")
+    //                 .record(id as string)
+    //                 .call("updateOwners", [owners]);
+    //             res.status(200).json({ response: recordData });
+    //             return;
+    //         }
+    //         if (
+    //             !body.hasOwnProperty("name") ||
+    //             !body.hasOwnProperty("description")
+    //         ) {
+    //             res.status(400).json({ response: "Missing required fields" });
+    //             return;
+    //         }
+    //         const recordData = await db
+    //             .collection("MultiSig")
+    //             .record(id as string)
+    //             .call("updateRecord", [name, description]);
+    //         res.status(200).json({ response: recordData });
+    //         return;
+    //     } else if (req.body.collection === "MultiSigProposals") {
+    //         const {
+    //             transactionHash,
+    //             description,
+    //             creator,
+    //         } = req.body;
+    //         if (body.hasOwnProperty("transactionHash")) {
+    //             const recordData = await db
+    //                 .collection("MultiSigProposals")
+    //                 .record(id as string)
+    //                 .call("addTransactionHash", [transactionHash]);
+    //             res.status(200).json({ response: recordData });
+    //             return;
+    //         }
+    //         if (
+    //             !body.hasOwnProperty("description") ||
+    //             !body.hasOwnProperty("creator")
+    //         ) {
+    //             res.status(400).json({ response: "Missing required fields" });
+    //             return;
+    //         }
+    //         const replyId = uuidv4();
+    //         const createdAt = Date.now(); // or (new Date()).getTime()
+    //         const replyRecordData = await db
+    //             .collection("Reply")
+    //             .create([
+    //                 replyId as string,
+    //                 description,
+    //                 createdAt.toString(),
+    //                 creator,
+    //             ]);
+
+    //         const recordData = await db
+    //             .collection("MultiSigProposals")
+    //             .record(id as string)
+    //             .call("addReply", [
+    //                 await db.collection("Reply").record(replyId as string),
+    //             ]);
+
+    //         res.status(200).json({ response: recordData });
+    //         return;
+    //     } else if (req.body.collection === "App") {
+    //         const { description, creator } = req.body;
+    //         if (
+    //             !body.hasOwnProperty("description") ||
+    //             !body.hasOwnProperty("creator")
+    //         ) {
+    //             res.status(400).json({ response: "Missing required fields" });
+    //             return;
+    //         }
+    //         const replyId = uuidv4();
+    //         const createdAt = Date.now(); // or (new Date()).getTime()
+    //         const replyRecordData = await db
+    //             .collection("Reply")
+    //             .create([
+    //                 replyId as string,
+    //                 description,
+    //                 createdAt.toString(),
+    //                 creator,
+    //             ]);
+
+    //         const recordData = await db
+    //             .collection("App")
+    //             .record(id as string)
+    //             .call("addReply", [
+    //                 await db.collection("Reply").record(replyId as string),
+    //             ]);
+
+    //         res.status(200).json({ response: recordData });
+    //         return;
+    //     } else {
+    //         res.status(400).json({ response: "Invalid collection" });
+    //         return;
+    //     }
+    // }
+
+    // invalid method
+    return res.status(400).json({ response: "Invalid method" });
+}
