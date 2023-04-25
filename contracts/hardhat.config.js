@@ -47,11 +47,25 @@ module.exports = {
             url: "https://liberty20.shardeum.org/",
             chainId: 8081,
             accounts:[PRIVATE_KEY]
+        },
+        "mantle-testnet": {
+            url: "https://rpc.testnet.mantle.xyz/",
+            chainId: 5001,
+            accounts: [PRIVATE_KEY]
         }
     },
     etherscan: {
         apiKey: process.env.MUMBAI_POLYGONSCAN,
-        customChains: [],
+        customChains: [
+            {
+                network: "mantle-testnet",
+                chainId: 5001,
+                urls: {
+                    apiURL: "https://explorer.testnet.mantle.xyz/api",
+                    browserURL: "https://explorer.testnet.mantle.xyz/"
+                }
+            }
+        ],
     },
     paths: {
         sources: "./contracts",
