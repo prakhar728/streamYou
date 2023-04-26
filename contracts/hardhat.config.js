@@ -44,12 +44,12 @@ module.exports = {
             accounts: [PRIVATE_KEY]
         },
         liberty: {
-            url: "https://liberty20.shardeum.org/",
+            url: "https://liberty20.shardeum.org",
             chainId: 8081,
             accounts:[PRIVATE_KEY]
         },
         "mantle-testnet": {
-            url: "https://rpc.testnet.mantle.xyz/",
+            url: "https://rpc.testnet.mantle.xyz",
             chainId: 5001,
             accounts: [PRIVATE_KEY]
         }
