@@ -2,10 +2,17 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
 
-
-
 const Home: NextPage = () => {
 
+    /*
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        console.log(name);
+        const file = jsonToFile({name}, "name.json");
+        const res = await uploadSpheron(file)
+        console.log({res});
+    }
+    */
 
   return (
     <div className={styles.container}>
@@ -17,7 +24,6 @@ const Home: NextPage = () => {
         />
         <link href="/favicon.ico" rel="icon" />
       </Head>
-      
     </div>
   );
 };
