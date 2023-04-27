@@ -5,6 +5,7 @@ import { Image } from '@chakra-ui/react';
 import {AiOutlineCloseCircle} from "react-icons/ai";
 const index = () => {
     const [selectedFile, setSelectedFile] = useState()
+  
     const [preview, setPreview] = useState<string|undefined>('')
     useEffect(() => {
         if (!selectedFile) {
@@ -19,16 +20,18 @@ const index = () => {
         // free memory when ever this component is unmounted
         return () => URL.revokeObjectURL(objectUrl)
      }, [selectedFile])
+
+
      const resetFile = (e:any)=>{
         setSelectedFile(undefined)
      }
+
+
      const onSelectFile = (e:any) => {
         if (!e.target.files || e.target.files.length === 0) {
             setSelectedFile(undefined)
             return
         }
-
-        // I've kept this example simple by using the first image instead of multiple
         setSelectedFile(e.target.files[0])
     }
 
@@ -49,7 +52,7 @@ const index = () => {
                                     }
                                     {!selectedFile && <>
                                         <FormLabel>Upload Image Here</FormLabel>
-                                        <Input placeholder='Upload your Images' type='file' h='80%'textAlign={'center'}  onChange={onSelectFile}/>
+                                        <Input  placeholder='Upload your Images' type='file' h='80%'textAlign={'center'}  onChange={onSelectFile}/>
                                     </> }
                                         
                                     </FormControl>
@@ -59,10 +62,11 @@ const index = () => {
                                         <FormLabel>Channel Name</FormLabel>
                                         <Input placeholder='Fantastic Rider' />
                                     </FormControl>
-                                    <FormControl>
+                                    {/* ADD BOOLEAN CHECKBOX */}
+                                    {/* <FormControl>
                                         <FormLabel>Nft Contract Address</FormLabel>
                                         <Input placeholder='0x000000' />
-                                    </FormControl>
+                                    </FormControl> */}
 
                                 </VStack>
                             </Stack>

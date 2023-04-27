@@ -8,12 +8,24 @@ import { publicProvider } from 'wagmi/providers/public';
 import { ChakraProvider } from '@chakra-ui/react'
 import { NextPage } from 'next';
 import { ReactElement, ReactNode } from 'react';
+
+const hyperspace = {
+  id: 3_141,
+  name: 'Hyperspace',
+  network: 'Hyperspace',
+  nativeCurrency: {
+      decimals: 18,
+      name: 'Filecoin',
+      symbol: 'tFIL',
+  },
+  rpcUrls: {
+      default: "https://api.hyperspace.node.glif.io/rpc/v1",
+  },
+}
+
+
 const { chains, provider, webSocketProvider } = configureChains(
-  [
-    polygonMumbai,
-    filecoinHyperspace,
-    ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true' ? [goerli ] : []),
-  ],
+  [filecoinHyperspace],
   [publicProvider()]
 );
 

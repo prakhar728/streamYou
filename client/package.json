@@ -12,6 +12,8 @@
     "@chakra-ui/react": "^2.5.5",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@huddle01/huddle01-iframe": "^0.0.9",
+    "@huddle01/react": "^0.0.7",
     "@polybase/client": "^0.5.0",
     "@rainbow-me/rainbowkit": "^0.12.9",
     "ethers": "^5.0.0",

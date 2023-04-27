@@ -15,7 +15,6 @@ type Data = {
 };
 
 const schema = `
-
 @public
 collection Creator {
   id: string;
