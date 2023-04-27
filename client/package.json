@@ -16,6 +16,8 @@
     "@huddle01/react": "^0.0.7",
     "@polybase/client": "^0.5.0",
     "@rainbow-me/rainbowkit": "^0.12.9",
+    "@spheron/browser-upload": "^1.0.0",
+    "@spheron/storage": "^1.0.13",
     "ethers": "^5.0.0",
     "framer-motion": "^10.12.4",
     "next": "^12.1.6",

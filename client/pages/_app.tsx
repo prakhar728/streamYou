@@ -2,10 +2,11 @@ import '../styles/globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
 import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import type { AppProps } from 'next/app';
-import { configureChains, createClient, useQueryClient, WagmiConfig } from 'wagmi';
-import { arbitrum, goerli, mainnet, optimism, polygon,polygonMumbai,filecoinHyperspace } from 'wagmi/chains';
+import {Chain, configureChains, createClient, useQueryClient, WagmiConfig} from 'wagmi';
+import { goerli,polygonMumbai,filecoinHyperspace } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 import { ChakraProvider } from '@chakra-ui/react'
+<<<<<<< HEAD
 import { NextPage } from 'next';
 import { ReactElement, ReactNode } from 'react';
 
@@ -26,6 +27,57 @@ const hyperspace = {
 
 const { chains, provider, webSocketProvider } = configureChains(
   [filecoinHyperspace],
+=======
+
+const sharedeumLiberty: Chain = {
+    name: 'Sharedeum Liberty',
+    id: 8081,
+    rpcUrls: {
+        default: {
+            http: ["https://liberty20.shardeum.org/"]
+        },
+        public: {
+            http: ["https://liberty20.shardeum.org/"]
+        }
+    },
+    testnet: true,
+    nativeCurrency: {
+        decimals: 18,
+        name: "Shardeum Liberty",
+        symbol: "SHM"
+    },
+    network: "shardeum",
+}
+
+const mantleTestnet: Chain = {
+    name: 'Mantle Testnet',
+    id: 5001,
+    rpcUrls: {
+        default: {
+            http: ["https://rpc.testnet.mantle.xyz"]
+        },
+        public: {
+            http: ["https://rpc.testnet.mantle.xyz"]
+        }
+    },
+    testnet: true,
+    nativeCurrency: {
+        decimals: 18,
+        name: "$BIT",
+        symbol: "BIT"
+    },
+    network: "mantle",
+}
+
+const { chains, provider, webSocketProvider } = configureChains(
+  [
+    polygonMumbai,
+    filecoinHyperspace,
+    sharedeumLiberty,
+    mantleTestnet,
+    ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true' ? [goerli ] : []),
+  ],
+>>>>>>> 101697d400be70b973d9193607856107a83fc86f
   [publicProvider()]
 );
 
