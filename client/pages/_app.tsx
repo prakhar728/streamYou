@@ -6,9 +6,6 @@ import {Chain, configureChains, createClient, useQueryClient, WagmiConfig} from 
 import { goerli,polygonMumbai,filecoinHyperspace } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 import { ChakraProvider } from '@chakra-ui/react'
-<<<<<<< HEAD
-import { NextPage } from 'next';
-import { ReactElement, ReactNode } from 'react';
 
 const hyperspace = {
   id: 3_141,
@@ -23,11 +20,6 @@ const hyperspace = {
       default: "https://api.hyperspace.node.glif.io/rpc/v1",
   },
 }
-
-
-const { chains, provider, webSocketProvider } = configureChains(
-  [filecoinHyperspace],
-=======
 
 const sharedeumLiberty: Chain = {
     name: 'Sharedeum Liberty',
@@ -77,7 +69,6 @@ const { chains, provider, webSocketProvider } = configureChains(
     mantleTestnet,
     ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true' ? [goerli ] : []),
   ],
->>>>>>> 101697d400be70b973d9193607856107a83fc86f
   [publicProvider()]
 );
 
