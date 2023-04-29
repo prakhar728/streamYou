@@ -9,11 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@chakra-ui/react": "^2.5.5",
-    "@emotion/react": "^11.10.6",
-    "@emotion/styled": "^11.10.6",
+    "@chakra-ui/react": "^2.6.0",
+    "@emotion/react": "^11.10.8",
+    "@emotion/styled": "^11.10.8",
     "@huddle01/huddle01-iframe": "^0.0.9",
     "@huddle01/react": "^0.0.7",
+    "@lighthouse-web3/sdk": "^0.2.1",
     "@polybase/client": "^0.5.0",
     "@rainbow-me/rainbowkit": "^0.12.9",
     "@spheron/browser-upload": "^1.0.0",
