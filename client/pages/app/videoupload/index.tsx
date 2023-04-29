@@ -5,13 +5,18 @@ import { AiOutlineCloseCircle } from 'react-icons/ai';
 import Huddle from "../../../components/Huddle";
 import HuddleLogo from "../../../assets/HuddleLogo.webp";
 import Link from 'next/link';
-import {Link as ChakraLink} from '@chakra-ui/react';
+import { Link as ChakraLink } from '@chakra-ui/react';
 import LightHouseSDK from "../../../assets/lightHouseLogo.svg"
-import Image, { StaticImageData } from 'next/image';
+import Image from 'next/image';
+import axios, { AxiosHeaderValue } from 'axios';
+import { useAccount } from 'wagmi'
+import { useRouter } from 'next/router';
+
 const index = () => {
   const [selectedFile, setSelectedFile] = useState()
-
-  const [preview, setPreview] = useState<string| undefined>('')
+  const { address } = useAccount()
+  const [preview, setPreview] = useState<string | undefined>('');
+  const router = useRouter();
   useEffect(() => {
     if (!selectedFile) {
       setPreview(undefined)
@@ -36,6 +41,38 @@ const index = () => {
       return
     }
     setSelectedFile(e.target.files[0])
+  }
+
+
+  const getAndNavigateToRoom = async () => {
+
+    try {
+      if (process.env.NEXT_PUBLIC_HUDDLE_KEY) {
+        const HUDDLE_KEY: AxiosHeaderValue | undefined = process.env.NEXT_PUBLIC_HUDDLE_KEY;
+
+        const response = await axios.post(
+          'https://iriko.testing.huddle01.com/api/v1/create-room',
+          {
+            title: 'Personal Cam',
+            hostWallets: [address],
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': HUDDLE_KEY,
+            },
+          }
+        );
+        // console.log(response.data.data.roomId);
+
+        const roomId = response.data.data.roomId;
+        router.push(`/app/video?roomid=${roomId}`)
+      }
+    }
+    catch (error: any) {
+      console.log(error);
+
+    }
   }
   return (
     <Navbar>
@@ -69,22 +106,24 @@ const index = () => {
             </FormControl>
           </Stack>
           <Stack flexDirection={"row"} justifyContent={"space-between"} h="50%" alignItems={"center"} w="80%">
-            <Box display={'flex'} flexDirection={'column'} justifyContent={'space-evenly'} alignItems={'center'}>
-            <ChakraLink as={Link} href="/app/huddle">
+            <Box display={'flex'} flexDirection={'column'} justifyContent={'space-evenly'} alignItems={'center'} _hover={{
+              cursor: "pointer",
+            }} onClick={() => {
+              getAndNavigateToRoom();
+            }}>
               <Text>Record the Video Using Huddle01</Text>
-            </ChakraLink>
-            <Image src={HuddleLogo} alt='Huddele Logo'/>
+              <Image src={HuddleLogo} alt='Huddele Logo' />
             </Box>
-            
+
             <Box display={'flex'} flexDirection={'column'} justifyContent={'space-evenly'} alignItems={'center'}>
-            <ChakraLink as={Link} href="/Lighthouse">
-             <Text> Store a pre-recorded video on Lighthouse!</Text>
-           </ChakraLink>
-           <Image src={LightHouseSDK} alt='Huddele Logo'/>
+              <ChakraLink as={Link} href="/Lighthouse">
+                <Text> Store a pre-recorded video on Lighthouse!</Text>
+              </ChakraLink>
+              <Image src={LightHouseSDK} alt='Huddele Logo' />
             </Box>
-          
+
           </Stack>
-         
+
         </Stack>
       </Center>
     </Navbar>
