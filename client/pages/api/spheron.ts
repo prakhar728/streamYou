@@ -14,6 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 name: bucketName,
                 protocol,
             })
+            console.log("upload token generated")
 
             res.status(200).json({uploadToken})
         } catch (e: any){

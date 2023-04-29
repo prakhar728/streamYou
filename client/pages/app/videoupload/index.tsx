@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import Navbar from "../../../components/NavBar/NavBar";
 import { Box, Center, Checkbox, FormControl, FormLabel, HStack, Image as ChakraImage, Input, Stack, Text, Textarea } from '@chakra-ui/react';
 import { AiOutlineCloseCircle } from 'react-icons/ai';
 import HuddleLogo from "../../../assets/HuddleLogo.webp";
+import Link from 'next/link';
+import {Link as ChakraLink} from '@chakra-ui/react';
+import LightHouseSDK from "../../../assets/lightHouseLogo.svg"
 import Image from 'next/image';
 import axios, { AxiosHeaderValue } from 'axios';
 import { useAccount } from 'wagmi'
@@ -24,9 +27,9 @@ const index = () => {
       return
     }
 
-    // create the preview
-    const objectUrl = URL.createObjectURL(selectedFile)
-    setPreview(objectUrl)
+        // create the preview
+        const objectUrl = URL.createObjectURL(selectedFile)
+        setPreview(objectUrl)
 
     // free memory when ever this component is unmounted
     return () => URL.revokeObjectURL(objectUrl)
@@ -69,25 +72,6 @@ const index = () => {
     console.log(percentageDone);
   };
 
-  // const uploadFile = async(e:any) =>{
-  //   console.log(e.target.files[0]);
-
-  //   // Push file to lighthouse node
-  //   // Both file and folder are supported by upload function
-  //   const output = await lighthouse.upload(e.target.files[0].name, "6e121ef8.fbd921bfe33a44ad85a633064ac18ed5", progressCallback);
-  //   console.log('File Status:', output);
-  //   /*
-  //     output:
-  //       data: {
-  //         Name: "filename.txt",
-  //         Size: 88000,
-  //         Hash: "QmWNmn2gr4ZihNPqaC5oTeePsHvFtkWNpjY3cD6Fd5am1w"
-  //       }
-  //     Note: Hash in response is CID.
-  //   */
-
-  //     console.log('Visit at https://gateway.lighthouse.storage/ipfs/' + output.data.Hash);
-  // }
   const uploadFile = async (e: any) => {
     e.persist()
 
@@ -98,31 +82,30 @@ const index = () => {
   }
   const getAndNavigateToRoom = async () => {
 
-    try {
-      if (process.env.NEXT_PUBLIC_HUDDLE_KEY) {
-        const HUDDLE_KEY: AxiosHeaderValue | undefined = process.env.NEXT_PUBLIC_HUDDLE_KEY;
+        try {
+            if (process.env.NEXT_PUBLIC_HUDDLE_KEY) {
+                const HUDDLE_KEY: AxiosHeaderValue | undefined = process.env.NEXT_PUBLIC_HUDDLE_KEY;
 
-        const response = await axios.post(
-          'https://iriko.testing.huddle01.com/api/v1/create-room',
-          {
-            title: 'Personal Cam',
-            hostWallets: [address],
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'x-api-key': HUDDLE_KEY,
-            },
-          }
-        );
-        // console.log(response.data.data.roomId);
+                const response = await axios.post(
+                    'https://iriko.testing.huddle01.com/api/v1/create-room',
+                    {
+                        title: 'Personal Cam',
+                        hostWallets: [address],
+                    },
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-api-key': HUDDLE_KEY,
+                        },
+                    }
+                );
+                // console.log(response.data.data.roomId);
 
-        const roomId = response.data.data.roomId;
-        router.push(`/app/video?roomid=${roomId}`)
-      }
-    }
-    catch (error: any) {
-      console.log(error);
+                const roomId = response.data.data.roomId;
+                router.push(`/app/video?roomid=${roomId}`)
+            }
+        } catch (error: any) {
+            console.log(error);
 
     }
   }
@@ -175,12 +158,12 @@ const index = () => {
               {progressBarValue==100 && <Text>File Upload Succesfull!</Text> }
             </Box>
 
-          </Stack>
+                    </Stack>
 
-        </Stack>
-      </Center>
-    </Navbar>
-  )
+                </Stack>
+            </Center>
+        </Navbar>
+    )
 }
 
-export default index
+export default index;
