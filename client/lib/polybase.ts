@@ -4,10 +4,7 @@ interface Creator {
     id: `0x${string}`;
     name: string;
     description: string;
-    publicKey: string;
     image: string;
-    nftContractAddress: string;
-    groupID: string
 }
 
 interface Video {
@@ -29,14 +26,14 @@ interface Comment {
 }
 
 export const createCreator = async (creator: Creator) => {
-    const {id, publicKey, name, description, image, nftContractAddress, groupID} = creator;
+    const {id, name, description, image} = creator;
     const response = await axios.post(`/api/polybase`, {
-        id, publicKey, name, description, image, nftContractAddress, groupID, collection: "Creator"
+        id, name, description, image, collection: "Creator"
     })
     if (response.status !== 200) {
         throw new Error("Error creating profile");
     }
-    return response.data();
+    return response.data;
 
 }
 

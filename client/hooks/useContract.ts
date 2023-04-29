@@ -17,6 +17,15 @@ export const useContract = () => {
     }
 
     /**
+     * Get the chain id for the current network
+     * @returns {Promise<number>}
+     */
+    const getChainId = async () => {
+        const provider = await signer?.provider
+        return (await provider?.getNetwork())?.chainId
+    }
+
+    /**
      * Get the contract for the current network
      * @param {string} contractAddress
      * @returns {ethers.Contract}
@@ -90,6 +99,17 @@ export const useContract = () => {
     }
 
     /**
+     * Check if channel exists or not
+     * @param channelName
+     * @returns {Promise<boolean>}
+     */
+    const channelExists = async (channelName: string) => {
+        const contractAddress = await getContractAddress()
+        const contract = getContract(contractAddress)
+        return await contract.channelExists(channelName)
+    }
+
+    /**
      * Get the metadata uri for a token
      * @param tokenId
      * @returns {Promise<string>}
@@ -142,6 +162,8 @@ export const useContract = () => {
         getTokenMetadataUri,
         getUriForToken,
         getTokenPrice,
-        getChannelTokens
+        getChannelTokens,
+        getChainId,
+        channelExists
     }
 }

@@ -87,6 +87,13 @@ contract StreamYou is ERC1155 {
         if(tokenId > _tokenIds.current()){ revert();}
     }
 
+    // @notice returns true if a channel exists
+    // @param channelName The name of the channel
+    // @return true if the channel exists
+    function channelExists(string memory channelName) public view returns(bool){
+        return _channelInfo[channelName].channelOwner != address(0);
+    }
+
     // @notice returns the total number of minted NFTs
     function totalSupply() public view returns (uint256){
         return _tokenIds.current();

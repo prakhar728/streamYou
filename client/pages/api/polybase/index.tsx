@@ -18,34 +18,20 @@ const schema = `
 @public
 collection Creator {
   id: string;
-  publicKey: PublicKey;
   name: string; 
   description:string;
   image:string;
-  nftContractAddress:string;
-  groupID:string;
-  videos?:Video[]
+  videos?:Video[];
   
-  constructor (id:string,publicKey:string,name:string,description:string,image:string,nftContractAddress:string,groupID:string) {
-    if(!ctx.publicKey)
-    {
-      throw error('Need Public Key')
-    }
+  constructor (id:string,name:string,description:string,image:string) {
     this.id = id;
-    this.publicKey=publicKey;
     this.name=name;
     this.description=description;
     this.image=image;
-    this.nftContractAddress=nftContractAddress;
-    this.groupID=groupID;
   }
 
   addVideo(video:Video){
-    if(ctx.publicKey!=this.publicKey)
-    {
-      throw error("Invalid User. Only Owner can upload");
-    }
-    this.videos.push(video)
+    this.videos.push(video);
   }
   
 }
@@ -62,7 +48,7 @@ collection Video{
   comments: Comment[];
 
   constructor(id:string,title:string,description:string,thumbnail:string,isTokenGated:boolean,channelId:string,uploadDate:string){
-     this.id = string;
+    this.id = id;
     this.title=title;
     this.description=description;
     this.thumbnail=thumbnail;
@@ -93,7 +79,7 @@ collection Video{
 
 const signInPolybase = () => {
     const db = new Polybase({
-        defaultNamespace: "streamYou",
+        defaultNamespace: "streamYou-test",
     });
 
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY as string);
@@ -181,13 +167,13 @@ export default async function handler(
 
         if (req.body.collection === "Creator") {
             // Create a record
-            const {id, publicKey, name, description, image, nftContractAddress, groupID} = req.body;
+            const {id, name, description, image} = req.body;
             if (
-                !body.hasOwnProperty("name") || !body.hasOwnProperty("description") || !body.hasOwnProperty("image") || !body.hasOwnProperty("nftContractAddress") || !body.hasOwnProperty("groupID") || !body.hasOwnProperty("id") || !body.hasOwnProperty("publicKey")
+                !body.hasOwnProperty("name") || !body.hasOwnProperty("description") || !body.hasOwnProperty("image") || !body.hasOwnProperty || !body.hasOwnProperty("id")
             ) {
                 res.status(400).json({response: "Missing Required Fields"});
             }
-            const response = await db.collection("Creator").create([id, publicKey, name, description, image, nftContractAddress, groupID]);
+            const response = await db.collection("Creator").create([id, name, description, image]);
             res.status(200).json({response: response});
             return;
         } else if (req.body.collection === "Videos") {

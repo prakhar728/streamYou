@@ -7,20 +7,6 @@ import { goerli,polygonMumbai,filecoinHyperspace } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 import { ChakraProvider } from '@chakra-ui/react'
 
-const hyperspace = {
-  id: 3_141,
-  name: 'Hyperspace',
-  network: 'Hyperspace',
-  nativeCurrency: {
-      decimals: 18,
-      name: 'Filecoin',
-      symbol: 'tFIL',
-  },
-  rpcUrls: {
-      default: "https://api.hyperspace.node.glif.io/rpc/v1",
-  },
-}
-
 const sharedeumLiberty: Chain = {
     name: 'Sharedeum Liberty',
     id: 8081,
