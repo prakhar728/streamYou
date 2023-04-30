@@ -175,6 +175,7 @@ export default async function handler(
                 !body.hasOwnProperty("name") || !body.hasOwnProperty("description") || !body.hasOwnProperty("image") || !body.hasOwnProperty || !body.hasOwnProperty("id")
             ) {
                 res.status(400).json({response: "Missing Required Fields"});
+                return;
             }
             const response = await db.collection("Creator").create([id, name, description, image]);
             res.status(200).json({response: response});
