@@ -120,139 +120,135 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Data>
 ) {
-    res.setHeader("Access-Control-Allow-Origin", "*")
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
-    res.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, X-Auth-Token")
-    cors()(req, res, async () => {
+    const db = signInPolybase();
 
-        const db = signInPolybase();
+    // Create a collection
+    const createResponse = await db.applySchema(schema);
+    // console.log(createResponse);
 
-        // Create a collection
-        const createResponse = await db.applySchema(schema);
-        // console.log(createResponse);
+    const body = req.body;
+    const params = req.query;
 
-        const body = req.body;
-        const params = req.query;
+    //CHECK FOR BODY AND PARAMS
+    if (req.method === "GET") {
+        if (!params || Object.keys(params).length === 0) {
+            res.status(400).json({response: "Missing query params"});
+            return;
+        }
+    } else if (req.method === "POST" || req.method === "PATCH") {
+        if (!body || Object.keys(body).length === 0) {
+            res.status(400).json({response: "Missing body"});
+            return;
+        }
+    }
 
-        //CHECK FOR BODY AND PARAMS
-        if (req.method === "GET") {
-            if (!params || Object.keys(params).length === 0) {
-                res.status(400).json({response: "Missing query params"});
-                return;
-            }
-        } else if (req.method === "POST" || req.method === "PATCH") {
-            if (!body || Object.keys(body).length === 0) {
-                res.status(400).json({response: "Missing body"});
-                return;
-            }
+    if (req.method === "GET") {
+        const {collection} = params;
+        if (!collection) {
+            res.status(400).json({
+                response: "Missing required field 'collection'",
+            });
+            return;
+        }
+        if (collection === "Creator") {
+            const userCollection = db.collection("Creator");
+            await handleGet(req, res, userCollection);
+        } else if (collection === "Videos") {
+            const postsCollection = db.collection("Video");
+            await handleGet(req, res, postsCollection);
+        } else {
+            res.status(400).json({response: "Invalid collection"});
+        }
+        return;
+    }
+    else if (req.method === "POST") {
+        //ID WILL BE THE PUBLIC KEY OF THE CREATOR
+        const {id} = body;
+        if (!id) {
+            res.status(400).json({response: "Missing required field 'id'"});
+            return;
         }
 
-        if (req.method === "GET") {
-            const {collection} = params;
-            if (!collection) {
-                res.status(400).json({
-                    response: "Missing required field 'collection'",
-                });
+        if (req.body.collection === "Creator") {
+            // Create a record
+            const {id, name, description, image} = req.body;
+            if (
+                !body.hasOwnProperty("name") || !body.hasOwnProperty("description") || !body.hasOwnProperty("image") || !body.hasOwnProperty || !body.hasOwnProperty("id")
+            ) {
+                res.status(400).json({response: "Missing Required Fields"});
                 return;
             }
-            if (collection === "Creator") {
-                const userCollection = db.collection("Creator");
-                await handleGet(req, res, userCollection);
-            } else if (collection === "Videos") {
-                const postsCollection = db.collection("Video");
-                await handleGet(req, res, postsCollection);
-            } else {
-                res.status(400).json({response: "Invalid collection"});
-            }
+            const response = await db.collection("Creator").create([id, name, description, image]);
+            res.status(200).json({response: response});
             return;
-        } else if (req.method === "POST") {
-            //ID WILL BE THE PUBLIC KEY OF THE CREATOR
-            const {id} = body;
-            if (!id) {
-                res.status(400).json({response: "Missing required field 'id'"});
+        } else if (req.body.collection === "Videos") {
+            const {id, title, description, thumbnail, isTokenGated, channelId, uploadDate, creatorId} = req.body;
+            if (
+                !body.hasOwnProperty("id") ||
+                !body.hasOwnProperty("title") || !body.hasOwnProperty("description") ||
+                !body.hasOwnProperty("thumbnail") || !body.hasOwnProperty("isTokenGated") ||
+                !body.hasOwnProperty("channelId") || !body.hasOwnProperty("iuploadDated")
+            ) {
+                res.status(400).json({response: "Missing required fields"});
                 return;
             }
-
-            if (req.body.collection === "Creator") {
-                // Create a record
-                const {id, name, description, image} = req.body;
-                if (
-                    !body.hasOwnProperty("name") || !body.hasOwnProperty("description") || !body.hasOwnProperty("image") || !body.hasOwnProperty || !body.hasOwnProperty("id")
-                ) {
-                    res.status(400).json({response: "Missing Required Fields"});
-                    return;
-                }
-                const response = await db.collection("Creator").create([id, name, description, image]);
-                res.status(200).json({response: response});
-                return;
-            } else if (req.body.collection === "Videos") {
-                const {id, title, description, thumbnail, isTokenGated, channelId, uploadDate, creatorId} = req.body;
-                if (
-                    !body.hasOwnProperty("id") ||
-                    !body.hasOwnProperty("title") || !body.hasOwnProperty("description") ||
-                    !body.hasOwnProperty("thumbnail") || !body.hasOwnProperty("isTokenGated") ||
-                    !body.hasOwnProperty("channelId") || !body.hasOwnProperty("iuploadDated")
-                ) {
-                    res.status(400).json({response: "Missing required fields"});
-                    return;
-                }
-                //Create a Video Record
-                const uploadedVideo = await db
-                    .collection("Video")
-                    .create([id as string, title, description, thumbnail, isTokenGated, channelId, uploadDate]);
-                // Create a record
-                const response = await db
-                    .collection("Creator")
-                    .record(creatorId)
-                    .call("addVideo", [db.collection("Video").record(id)]);
-                res.status(200).json({response: response});
-            } else {
-                res.status(400).json({response: "Invalid collection"});
-                return;
-            }
+            //Create a Video Record
+            const uploadedVideo = await db
+                .collection("Video")
+                .create([id as string, title, description, thumbnail, isTokenGated, channelId, uploadDate]);
+            // Create a record
+            const response = await db
+                .collection("Creator")
+                .record(creatorId)
+                .call("addVideo", [db.collection("Video").record(id)]);
+            res.status(200).json({response: response});
+        } else {
+            res.status(400).json({response: "Invalid collection"});
             return;
-        } else if (req.method === "PATCH") {
-            const {id} = body;
-            if (!id) {
-                res.status(400).json({response: "Missing required field 'id'"});
+        }
+        return;
+    }
+    else if (req.method === "PATCH") {
+        const { id } = body;
+        if (!id) {
+            res.status(400).json({ response: "Missing required field 'id'" });
+            return;
+        }
+        if (req.body.collection === "Video") {
+            const {
+                description,
+                creator,
+            } = req.body;
+            if(!body.hasOwnProperty("description") || !body.hasOwnProperty("creator")) {
+                res.status(400).json({ response: "Missing required fields" });
                 return;
             }
-            if (req.body.collection === "Video") {
-                const {
+            const commentId = uuidv4();
+            const createdAt = Date.now(); // or (new Date()).getTime()
+            const replyRecordData = await db
+                .collection("Comment")
+                .create([
+                    commentId as string,
                     description,
+                    createdAt.toString(),
                     creator,
-                } = req.body;
-                if (!body.hasOwnProperty("description") || !body.hasOwnProperty("creator")) {
-                    res.status(400).json({response: "Missing required fields"});
-                    return;
-                }
-                const commentId = uuidv4();
-                const createdAt = Date.now(); // or (new Date()).getTime()
-                const replyRecordData = await db
-                    .collection("Comment")
-                    .create([
-                        commentId as string,
-                        description,
-                        createdAt.toString(),
-                        creator,
-                    ]);
+                ]);
 
-                const recordData = await db
-                    .collection("Video")
-                    .record(id as string)
-                    .call("addComment", [
-                        await db.collection("Comment").record(commentId as string),
-                    ]);
+            const recordData = await db
+                .collection("Video")
+                .record(id as string)
+                .call("addComment", [
+                    await db.collection("Comment").record(commentId as string),
+                ]);
 
-                res.status(200).json({response: recordData});
-                return;
-            } else {
-                res.status(400).json({response: "Invalid collection"});
-                return;
-            }
+            res.status(200).json({ response: recordData });
+            return;
+        } else {
+            res.status(400).json({ response: "Invalid collection" });
+            return;
         }
+    }
 
-        // invalid method
-        return res.status(400).json({response: "Invalid method"});
-    })
+    // invalid method
+    return res.status(400).json({response: "Invalid method"});
 }
