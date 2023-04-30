@@ -125,6 +125,9 @@ export default async function handler(
         optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
     });
     res.setHeader('Access-Control-Allow-Origin', 'https://bafybeibgobcnfd2cfm7pamlevvniss7zyugolru27qlbbawrf57dnxpl64.ipfs.sphn.link');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', '*');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
     const db = signInPolybase();
 
     // Create a collection
