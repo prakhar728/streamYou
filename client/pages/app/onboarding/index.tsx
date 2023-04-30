@@ -20,6 +20,7 @@ import {uploadSpheron} from "../../../lib/uploadSpheron";
 import {useContract} from "../../../hooks/useContract";
 import {createCreator} from "../../../lib/polybase";
 import {useAccount} from "wagmi";
+import lighthouseUpload from "../../../lib/lightHouseUploadFile";
 
 export default function Index() {
     const toast = useToast()
@@ -27,6 +28,8 @@ export default function Index() {
     const {createChannel, getChainId, channelExists} = useContract()
     const [loading, setLoading] = useState(false)
     const [selectedFile, setSelectedFile] = useState<File>()
+    const [progressBarValue, setprogressBarValue] = useState(0);
+    const [imageLink, setImageLink] = useState<string>('')
     const [form, setForm] = useState({
         title: '',
         description: '',
@@ -59,6 +62,25 @@ export default function Index() {
             return
         }
         setSelectedFile(e.target.files[0])
+        uploadFile(e)
+    }
+
+    const progressCallback = (progressData: any) => {
+        let completedTillNow = (progressData?.total / progressData?.uploaded)?.toFixed(2);
+        console.log(completedTillNow);
+
+        let percentageDone =
+            100 - parseInt(completedTillNow);
+        setprogressBarValue(percentageDone);
+        console.log(percentageDone);
+    };
+    const uploadFile = async (e: any) => {
+        e.persist()
+
+        if (process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY) {
+            const output = await lighthouseUpload(e, process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY, progressCallback);
+            console.log('File Status:', output);
+        }
     }
 
     const onSubmit = async (e: any) => {

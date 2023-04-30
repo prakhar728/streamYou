@@ -1,7 +1,11 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import {SpheronClient, ProtocolEnum} from "@spheron/storage"
+import cors from "cors"
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    res.setHeader("Access-Control-Allow-Origin", "*")
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
+    res.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, X-Auth-Token")
     if(req.method === "GET"){
         try {
             const bucketName = "stream-you"

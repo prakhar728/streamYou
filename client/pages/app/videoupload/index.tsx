@@ -14,7 +14,7 @@ import lighthouseUpload from '../../../lib/lightHouseUploadFile';
 import { Progress } from '@chakra-ui/react';
 import { useToast } from '@chakra-ui/react';
 
-const index = () => {
+export default function Index(){
   const [selectedFile, setSelectedFile] = useState()
   const { address } = useAccount()
   const [preview, setPreview] = useState<string | undefined>('');
@@ -165,5 +165,3 @@ const index = () => {
         </Navbar>
     )
 }
-
-export default index;
