@@ -9,7 +9,7 @@ module.exports = {
         return [
             {
                 source: '/api/:path*',
-                destination: 'https://bafybeibgobcnfd2cfm7pamlevvniss7zyugolru27qlbbawrf57dnxpl64.ipfs.sphn.link/:path*',
+                destination: 'https://stream-you.vercel.app/api/:path*',
             },
         ]
     }
