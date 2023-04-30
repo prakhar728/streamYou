@@ -8,7 +8,7 @@ interface Creator {
 }
 
 interface Video {
-    id: `0x${string}`;
+    id: string;
     title: string;
     description: string;
     thumbnail: string;
@@ -16,6 +16,7 @@ interface Video {
     channelId: string;
     uploadDate: string;
     creatorId: string;
+    tokenId: string;
 }
 
 interface Comment {
@@ -38,15 +39,15 @@ export const createCreator = async (creator: Creator) => {
 }
 
 export const addVideo = async (video: Video) => {
-    const {id, title, description, thumbnail, isTokenGated, channelId, uploadDate, creatorId} = video;
+    const {id, title, description, thumbnail, isTokenGated, channelId, uploadDate, creatorId, tokenId} = video;
 
     const response = await axios.post(`/api/polybase`, {
-        id, title, description, thumbnail, isTokenGated, channelId, uploadDate, creatorId, collection: "Videos"
+        id, title, description, thumbnail, isTokenGated, channelId, uploadDate, creatorId, tokenId, collection: "Videos"
     })
     if (response.status !== 200) {
-        throw new Error("Error creating profile");
+        throw new Error("Error adding video");
     }
-    return response.data();
+    return response.data;
 }
 
 export const addComment = async ({id, creator, description, collection}: Comment) => {
@@ -72,7 +73,7 @@ export const getAllCreators = async () => {
     if (response.status !== 200) {
         throw new Error("Error creating profile");
     }
-    return response.data();
+    return response.data;
 }
 
 export const getCreator = async (id: String) => {
@@ -85,7 +86,7 @@ export const getCreator = async (id: String) => {
     if (response.status !== 200) {
         throw new Error("Error creating profile");
     }
-    return response.data();
+    return response.data;
 }
 export const getAllVideos = async () => {
     const response = await axios.get(`/api/polybase`,
@@ -97,7 +98,7 @@ export const getAllVideos = async () => {
     if (response.status !== 200) {
         throw new Error("Error creating profile");
     }
-    return response.data();
+    return response.data;
 }
 
 export const getVideo = async (id: String) => {
@@ -110,7 +111,7 @@ export const getVideo = async (id: String) => {
     if (response.status !== 200) {
         throw new Error("Error creating profile");
     }
-    return response.data();
+    return response.data;
 }
 
 export const getComment = async (id: string) => {

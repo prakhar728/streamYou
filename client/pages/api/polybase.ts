@@ -45,21 +45,24 @@ collection Video{
   description:string;
   thumbnail:string;
   isTokenGated:boolean;
+  tokenId: string;
   channelId:string;
   uploadDate:string;
   comments: Comment[];
 
-  constructor(id:string,title:string,description:string,thumbnail:string,isTokenGated:boolean,channelId:string,uploadDate:string){
+  constructor(id:string,title:string,description:string,thumbnail:string,isTokenGated:boolean,channelId:string,uploadDate:string, tokenId: string){
     this.id = id;
     this.title=title;
     this.description=description;
     this.thumbnail=thumbnail;
     this.isTokenGated=isTokenGated;
-    this.chanelId=channelId;
+    this.channelId=channelId;
     this.uploadDate=uploadDate;
+    this.tokenId = tokenId;
+    this.comments = [];
   }
   
-  function addComment(comment:Comment){
+  function addComment (comment: Comment){
     this.comments.push(comment);
   }
 }
@@ -81,7 +84,7 @@ collection Video{
 
 const signInPolybase = () => {
     const db = new Polybase({
-        defaultNamespace: "streamYou-test",
+        defaultNamespace: "streamYou-test-v1.0",
     });
 
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY as string);
@@ -190,12 +193,12 @@ export default async function handler(
             res.status(200).json({response: response});
             return;
         } else if (req.body.collection === "Videos") {
-            const {id, title, description, thumbnail, isTokenGated, channelId, uploadDate, creatorId} = req.body;
+            const {id, title, description, thumbnail, isTokenGated, channelId, uploadDate, creatorId, tokenId} = req.body;
             if (
                 !body.hasOwnProperty("id") ||
                 !body.hasOwnProperty("title") || !body.hasOwnProperty("description") ||
                 !body.hasOwnProperty("thumbnail") || !body.hasOwnProperty("isTokenGated") ||
-                !body.hasOwnProperty("channelId") || !body.hasOwnProperty("iuploadDated")
+                !body.hasOwnProperty("channelId") || !body.hasOwnProperty("uploadDate") || !body.hasOwnProperty("creatorId") || !body.hasOwnProperty("tokenId")
             ) {
                 res.status(400).json({response: "Missing required fields"});
                 return;
@@ -203,7 +206,7 @@ export default async function handler(
             //Create a Video Record
             const uploadedVideo = await db
                 .collection("Video")
-                .create([id as string, title, description, thumbnail, isTokenGated, channelId, uploadDate]);
+                .create([id as string, title, description, thumbnail, isTokenGated == "true", channelId, uploadDate, tokenId]);
             // Create a record
             const response = await db
                 .collection("Creator")

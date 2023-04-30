@@ -58,8 +58,8 @@ export const useContract = () => {
     const createToken = async (channelName: string, metadataUri: string, price: string) => {
         const contractAddress = await getContractAddress()
         const contract = getContract(contractAddress)
-        const currentToken = await getCurrentToken()
-        const tx = await contract.createToken(channelName, metadataUri, ethers.utils.parseEther(price), currentToken)
+        const currentToken = parseInt(await getCurrentToken())
+        const tx = await contract.createToken(channelName, metadataUri, ethers.utils.parseEther(price), currentToken + 1, {gasLimit: 10000000})
         await tx.wait()
     }
 
