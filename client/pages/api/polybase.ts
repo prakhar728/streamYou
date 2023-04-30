@@ -10,6 +10,7 @@ import {ethPersonalSign} from "@polybase/eth";
 import {ethers} from "ethers";
 import {v4 as uuidv4} from "uuid";
 import cors from "cors"
+import NextCors from "nextjs-cors";
 
 type Data = {
     response: CollectionList<any> | CollectionRecordResponse<any> | string;
@@ -120,6 +121,12 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Data>
 ) {
+    await NextCors(req, res, {
+        // Options
+        methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+        origin: '*',
+        optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+    });
     const db = signInPolybase();
 
     // Create a collection
