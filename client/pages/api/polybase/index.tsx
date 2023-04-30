@@ -9,6 +9,7 @@ import {
 import {ethPersonalSign} from "@polybase/eth";
 import {ethers} from "ethers";
 import {v4 as uuidv4} from "uuid";
+import cors from "cors"
 
 type Data = {
     response: CollectionList<any> | CollectionRecordResponse<any> | string;
