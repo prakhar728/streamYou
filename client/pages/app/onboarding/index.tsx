@@ -80,6 +80,7 @@ export default function Index() {
         if (process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY) {
             const output = await lighthouseUpload(e, process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY, progressCallback);
             console.log('File Status:', output);
+            setImageLink(`https://ipfs.io/ipfs/${output?.data.Hash}`)
         }
     }
 
@@ -109,9 +110,6 @@ export default function Index() {
             setLoading(false)
             return
         }
-        const uploadRes = await uploadSpheron(selectedFile)
-        const imageLink = `${uploadRes!.protocolLink}/${selectedFile.name}`
-        console.log(imageLink)
         try{
             await createChannel(form.title)
             const chainId = await getChainId()
