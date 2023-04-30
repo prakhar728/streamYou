@@ -103,9 +103,6 @@ async function handleGet(
     res: NextApiResponse<Data>,
     collection: Collection<any>
 ) {
-    res.setHeader("Access-Control-Allow-Origin", "*")
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
-    res.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, X-Auth-Token")
     const {id} = req.query;
     if (!id) {
         const recordData = await collection.get();
@@ -127,6 +124,7 @@ export default async function handler(
         origin: '*',
         optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
     });
+    res.setHeader('Access-Control-Allow-Origin', 'https://bafybeibgobcnfd2cfm7pamlevvniss7zyugolru27qlbbawrf57dnxpl64.ipfs.sphn.link');
     const db = signInPolybase();
 
     // Create a collection
