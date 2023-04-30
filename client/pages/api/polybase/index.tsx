@@ -102,6 +102,9 @@ async function handleGet(
     res: NextApiResponse<Data>,
     collection: Collection<any>
 ) {
+    res.setHeader("Access-Control-Allow-Origin", "*")
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
+    res.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, X-Auth-Token")
     const {id} = req.query;
     if (!id) {
         const recordData = await collection.get();
