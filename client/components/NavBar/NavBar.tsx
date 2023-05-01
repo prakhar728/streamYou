@@ -1,27 +1,27 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import React, { ReactNode } from 'react';
 import {
-  IconButton,
-  Avatar,
-  Box,
-  CloseButton,
-  Flex,
-  HStack,
-  VStack,
-  Icon,
-  useColorModeValue,
-  Link,
-  Drawer,
-  DrawerContent,
-  Text,
-  useDisclosure,
-  BoxProps,
-  FlexProps,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
+    IconButton,
+    Avatar,
+    Box,
+    CloseButton,
+    Flex,
+    HStack,
+    VStack,
+    Icon,
+    useColorModeValue,
+    Link,
+    Drawer,
+    DrawerContent,
+    Text,
+    useDisclosure,
+    BoxProps,
+    FlexProps,
+    Menu,
+    MenuButton,
+    MenuDivider,
+    MenuItem,
+    MenuList, Image,
 } from '@chakra-ui/react';
 import {
   FiHome,
@@ -97,9 +97,10 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       h="full"
       {...rest}>
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Logo
-        </Text>
+          <Image src="/logo.png" boxSize='100%' fit={'contain'} alt="logo"/>
+        {/*<Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">*/}
+        {/*  Logo*/}
+        {/*</Text>*/}
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
       {LinkItems.map((link) => (
