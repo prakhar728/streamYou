@@ -122,6 +122,7 @@ export const getComment = async (id: string) => {
             collection: "Comment",
         },
     });
+    console.log(response)
     if (response.status !== 200) {
         throw new Error("Error getting comment");
     }

@@ -23,16 +23,17 @@ collection Creator {
   name: string; 
   description:string;
   image:string;
-  videos?:Video[];
+  videos:Video[];
   
   constructor (id:string,name:string,description:string,image:string) {
     this.id = id;
     this.name=name;
     this.description=description;
     this.image=image;
+    this.videos = [];
   }
 
-  addVideo(video:Video){
+  function addVideo(video:Video){
     this.videos.push(video);
   }
   
@@ -171,6 +172,7 @@ export default async function handler(
             await handleGet(req, res, postsCollection);
         } else if (collection === "Comment") {
             const commentCollection = db.collection("Comment");
+            console.log(commentCollection)
             await handleGet(req, res, commentCollection);
         } else {
             res.status(400).json({response: "Invalid collection"});
@@ -217,6 +219,7 @@ export default async function handler(
                 .collection("Creator")
                 .record(creatorId)
                 .call("addVideo", [db.collection("Video").record(id)]);
+            console.log(response)
             res.status(200).json({response: response});
         } else {
             res.status(400).json({response: "Invalid collection"});

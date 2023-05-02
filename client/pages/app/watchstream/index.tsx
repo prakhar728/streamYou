@@ -40,6 +40,7 @@ export default function Watchstream() {
     const [locked, setLocked] = useState<boolean>(true)
     const [purchased, setPurchased] = useState<boolean>(false)
     const [price, setPrice] = useState<number>(0)
+    const [fetched, setFetched] = useState<boolean>(false)
 
     useEffect(() => {
         if (mounted && router.isReady) {
@@ -67,6 +68,7 @@ export default function Watchstream() {
                     }
                     console.log(creatorRes)
                     setCreator(creatorRes.response.data)
+                    setFetched(true)
                 })()
             }
         }
@@ -193,11 +195,11 @@ export default function Watchstream() {
                                 </CardBody>
                             </Card>
                         }
-                        {/*{videoDetails?.comments?.map((comment: any) => {*/}
-                        {/*    return (*/}
-                        {/*        <Comment key={comment.id} id={comment.id}/>*/}
-                        {/*    )*/}
-                        {/*})}*/}
+                        {fetched && videoDetails?.comments?.map((comment: any) => {
+                            return (
+                                <Comment key={comment.id} id={comment.id}/>
+                            )
+                        })}
                     </Stack>
                 </Box>
             </Navbar>

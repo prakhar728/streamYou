@@ -1,4 +1,4 @@
-import {Card, CardBody, Flex, Text} from "@chakra-ui/react";
+import {Button, Card, CardBody, Flex, Text} from "@chakra-ui/react";
 import React, {useEffect, useState} from "react";
 import {getComment} from "../lib/polybase";
 import {useIsMounted} from "../hooks/useIsMounted";
@@ -6,13 +6,19 @@ import {useIsMounted} from "../hooks/useIsMounted";
 export default function Comment({id}: { id: string }) {
     const mounted = useIsMounted()
     const [comment, setComment] = useState<any>({})
+    const [fetching, setFetching] = useState<boolean>(false)
     useEffect(() => {
-        if (id)
-            (async () => {
-                const res = await getComment(id)
-                setComment(res.response.data)
-            })()
-    }, [id])
+        console.log(fetching, mounted)
+        if (!fetching && mounted) {
+            setFetching(true)
+            handleGet(id)
+        }
+    }, [id, mounted])
+    const handleGet = async (id: string) => {
+        const res = await getComment(id)
+        setComment(res.response.data)
+    }
+
     return (
         <Card>
             <CardBody>
@@ -27,6 +33,7 @@ export default function Comment({id}: { id: string }) {
                     }
                 </Flex>
                 <Text>{comment?.description}</Text>
+                {/*<Button onClick={handleGet}>Get Details</Button>*/}
             </CardBody>
         </Card>
     )
