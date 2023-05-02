@@ -169,6 +169,9 @@ export default async function handler(
         } else if (collection === "Videos") {
             const postsCollection = db.collection("Video");
             await handleGet(req, res, postsCollection);
+        } else if (collection === "Comment") {
+            const commentCollection = db.collection("Comment");
+            await handleGet(req, res, commentCollection);
         } else {
             res.status(400).json({response: "Invalid collection"});
         }

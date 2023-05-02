@@ -24,7 +24,6 @@ interface Comment {
     description: string;
     creator: string;
     id: string;
-    collection: "Comment";
 }
 
 export const createCreator = async (creator: Creator) => {
@@ -116,6 +115,7 @@ export const getVideo = async (id: String) => {
 }
 
 export const getComment = async (id: string) => {
+    console.log("getComment", id);
     const response = await axios.get(`/api/polybase`, {
         params: {
             id,
