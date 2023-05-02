@@ -8,7 +8,7 @@ import {useContract} from "../../../hooks/useContract";
 import {useIsMounted} from "../../../hooks/useIsMounted";
 import {getCreator, getVideo} from "../../../lib/polybase";
 
-export default function Index() {
+export default function Watchstream() {
     const router = useRouter()
     const {address, isConnected} = useAccount()
     const {balanceOf, getChainId} = useContract()
@@ -53,11 +53,13 @@ export default function Index() {
                     <Stack w="95%" my={7}>
                         <Flex justifyContent="space-between">
                             <Heading size={"md"} mx={5}>{videoDetails?.title || "Loading"}</Heading>
-                            <Text>{new Date(videoDetails?.uploadDate).toLocaleDateString(navigator.language, {
-                                day: 'numeric',
-                                month: 'short',
-                                year: 'numeric'
-                            })}</Text>
+                            {mounted &&
+                                <Text>{new Date(videoDetails?.uploadDate).toLocaleDateString(navigator.language, {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    year: 'numeric'
+                                })}</Text>
+                            }
                         </Flex>
                         <Text mx={5} px={5}>{videoDetails?.description || "Loading"}</Text>
                         <Flex mx={5} px={5} mt={6}>
