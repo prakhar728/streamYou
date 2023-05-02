@@ -14,3 +14,10 @@ a {
 * {
   box-sizing: border-box;
 }
+
+#videoPlayerWindow{
+width: 80vw;
+height:60vh;
+border-radius: 20px;
+border:1px solid rgba(0, 0, 0, 0.357);
+}
