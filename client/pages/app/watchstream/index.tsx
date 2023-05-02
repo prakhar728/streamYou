@@ -52,7 +52,7 @@ export default function Watchstream() {
       <Navbar>
         <Box display="flex" alignItems={"center"} flexDirection={"column"} minH={"90vh"}>
           {
-            videoDetails &&
+            videoDetails.videoLink &&
             <video controls autoPlay id="videoPlayerWindow">
               <source
                 src={videoDetails.videoLink}
