@@ -48,9 +48,10 @@ collection Video{
   tokenId: string;
   channelId:string;
   uploadDate:string;
+  videoLink: string;
   comments: Comment[];
 
-  constructor(id:string,title:string,description:string,thumbnail:string,isTokenGated:boolean,channelId:string,uploadDate:string, tokenId: string){
+  constructor(id:string,title:string,description:string,thumbnail:string,isTokenGated:boolean,channelId:string,uploadDate:string, tokenId: string, videoLink:string){
     this.id = id;
     this.title=title;
     this.description=description;
@@ -60,6 +61,7 @@ collection Video{
     this.uploadDate=uploadDate;
     this.tokenId = tokenId;
     this.comments = [];
+    this.videoLink = videoLink;
   }
   
   function addComment (comment: Comment){
@@ -193,12 +195,12 @@ export default async function handler(
             res.status(200).json({response: response});
             return;
         } else if (req.body.collection === "Videos") {
-            const {id, title, description, thumbnail, isTokenGated, channelId, uploadDate, creatorId, tokenId} = req.body;
+            const {id, title, description, thumbnail, isTokenGated, channelId, uploadDate, creatorId, tokenId, videoLink} = req.body;
             if (
                 !body.hasOwnProperty("id") ||
                 !body.hasOwnProperty("title") || !body.hasOwnProperty("description") ||
                 !body.hasOwnProperty("thumbnail") || !body.hasOwnProperty("isTokenGated") ||
-                !body.hasOwnProperty("channelId") || !body.hasOwnProperty("uploadDate") || !body.hasOwnProperty("creatorId") || !body.hasOwnProperty("tokenId")
+                !body.hasOwnProperty("channelId") || !body.hasOwnProperty("uploadDate") || !body.hasOwnProperty("creatorId") || !body.hasOwnProperty("tokenId") || !body.hasOwnProperty("videoLink")
             ) {
                 res.status(400).json({response: "Missing required fields"});
                 return;
@@ -206,7 +208,7 @@ export default async function handler(
             //Create a Video Record
             const uploadedVideo = await db
                 .collection("Video")
-                .create([id as string, title, description, thumbnail, isTokenGated == "true", channelId, uploadDate, tokenId]);
+                .create([id as string, title, description, thumbnail, isTokenGated == "true", channelId, uploadDate, tokenId, videoLink]);
             // Create a record
             const response = await db
                 .collection("Creator")

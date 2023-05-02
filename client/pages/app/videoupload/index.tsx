@@ -41,7 +41,6 @@ export default function Index() {
     const [selectedFile, setSelectedFile] = useState()
     const [preview, setPreview] = useState<string | undefined>('');
     const [progressBarValue, setprogressBarValue] = useState(0)
-    const [lightHouseLink, setLightHouseLink] = useState<string>('')
     const [loading, setLoading] = useState(false)
     const [form, setForm] = useState({
         title: '',
@@ -49,6 +48,8 @@ export default function Index() {
         isTokenGated: false,
         price: "0",
     })
+    const [lightHouseLink, setLightHouseLink] = useState<string>('')
+    const [count, setCount] = useState(0)
     useEffect(() => {
         if (!selectedFile) {
             setPreview(undefined)
@@ -72,6 +73,11 @@ export default function Index() {
             })
         }
     }, [progressBarValue])
+
+    useEffect(() => {
+        console.log(lightHouseLink)
+        console.log(count)
+    }, [count])
 
     const resetFile = (e: any) => {
         setSelectedFile(undefined)
@@ -100,7 +106,8 @@ export default function Index() {
         if (process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY) {
             const output = await lighthouseUpload(e, process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY, progressCallback);
             console.log('File Status:', output);
-            setLightHouseLink(`https://gateway.lighthouse.storage/ipfs/${output.data.Hash}`)
+            setLightHouseLink(`https://gateway.lighthouse.storage/ipfs/${output.data.Hash}`);
+            setCount(prev => prev + 1)
         }
     }
     const getAndNavigateToRoom = async () => {
@@ -174,7 +181,7 @@ export default function Index() {
         }
         const thumbnail = await uploadLighthouse([selectedFile])
         const thumbnailLink = `https://gateway.lighthouse.storage/ipfs/${thumbnail.data.Hash}`
-        console.log(thumbnailLink)
+        console.log({thumbnailLink, lightHouseLink})
         let polybaseData = {
             id: `${channelName}-${form.title}`,
             title: form.title,
@@ -184,7 +191,8 @@ export default function Index() {
             creatorId: creatorId,
             channelId: creatorId,
             uploadDate: new Date().toISOString(),
-            tokenId: "-1"
+            tokenId: "-1",
+            videoLink: lightHouseLink,
         }
         if (form.isTokenGated) {
             const metadata = {

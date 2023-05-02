@@ -17,6 +17,7 @@ interface Video {
     uploadDate: string;
     creatorId: string;
     tokenId: string;
+    videoLink: string;
 }
 
 interface Comment {
@@ -39,10 +40,10 @@ export const createCreator = async (creator: Creator) => {
 }
 
 export const addVideo = async (video: Video) => {
-    const {id, title, description, thumbnail, isTokenGated, channelId, uploadDate, creatorId, tokenId} = video;
+    const {id, title, description, thumbnail, isTokenGated, channelId, uploadDate, creatorId, tokenId, videoLink} = video;
 
     const response = await axios.post(`/api/polybase`, {
-        id, title, description, thumbnail, isTokenGated, channelId, uploadDate, creatorId, tokenId, collection: "Videos"
+        id, title, description, thumbnail, isTokenGated, channelId, uploadDate, creatorId, tokenId, videoLink, collection: "Videos"
     })
     if (response.status !== 200) {
         throw new Error("Error adding video");
@@ -50,9 +51,9 @@ export const addVideo = async (video: Video) => {
     return response.data;
 }
 
-export const addComment = async ({id, creator, description, collection}: Comment) => {
+export const addComment = async ({id, creator, description}: Comment) => {
     const response = await axios.patch(`/api/polybase`, {
-        collection: collection,
+        collection: "Video",
         id,
         creator,
         description,
