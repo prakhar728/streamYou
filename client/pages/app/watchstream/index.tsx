@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Navbar from "../../../components/NavBar/NavBar";
 import { Box, Card, CardBody, Heading, Stack, Text } from '@chakra-ui/react';
 const index = () => {
-  const [videoURL, setvideoURL] = useState("")
+  // const [videoURL, setvideoURL] = useState("")
   return (
     <Navbar>
       <Box display="flex" alignItems={"center"} flexDirection={"column"} minH={"90vh"} >
