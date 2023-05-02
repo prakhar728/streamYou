@@ -5,7 +5,7 @@ import {
     Box,
     Button,
     Card,
-    CardBody,
+    CardBody, Center,
     Flex,
     Heading,
     Input,
@@ -13,27 +13,34 @@ import {
     InputRightElement,
     Skeleton,
     Stack,
-    Text
+    Text, useToast
 } from '@chakra-ui/react';
 import Head from "next/head";
 import {useRouter} from "next/router";
-import {useAccount} from "wagmi";
+import {useAccount, useSigner} from "wagmi";
 import {useContract} from "../../../hooks/useContract";
 import {useIsMounted} from "../../../hooks/useIsMounted";
 import {addComment, getCreator, getVideo} from "../../../lib/polybase";
 import axios from 'axios';
 import Comment from "../../../components/Comment";
+import {ethers} from "ethers";
 
 export default function Watchstream() {
     const router = useRouter()
     const {address, isConnected} = useAccount()
-    const {balanceOf, getChainId} = useContract()
+    const {balanceOf, getTokenPrice, mintToken} = useContract()
     const mounted = useIsMounted()
+    const toast = useToast()
+    const {data: signer} = useSigner()
 
     const [loading, setLoading] = useState(false)
     const [creator, setCreator] = useState<any>({})
     const [videoDetails, setVideoDetails] = useState<any>({})
     const [comment, setComment] = useState<string>("")
+    const [locked, setLocked] = useState<boolean>(true)
+    const [purchased, setPurchased] = useState<boolean>(false)
+    const [price, setPrice] = useState<number>(0)
+
     useEffect(() => {
         if (mounted && router.isReady) {
             if (!isConnected) {
@@ -41,18 +48,29 @@ export default function Watchstream() {
                 router.push("/")
             }
             const {video} = router.query
-            if (video) {
-                getVideo(video as string).then((res) => {
-                    console.log(res)
-                    setVideoDetails(res.response.data)
-                    getCreator(res.response.data.channelId).then((res) => {
-                        console.log(res)
-                        setCreator(res.response.data)
-                    })
-                })
+            if (video && signer) {
+                (async () => {
+                    const videoRes = await getVideo(video as string)
+                    console.log(videoRes)
+                    setVideoDetails(videoRes.response.data)
+                    setLocked(videoRes.response.data.isTokenGated)
+                    const creatorRes = await getCreator(videoRes.response.data.channelId)
+                    if (videoRes.response.data.isTokenGated) {
+                        const hasPurchased = (await balanceOf(address as string, parseInt(videoRes.response.data.tokenId))).toString() !== "0"
+                        setPurchased(hasPurchased)
+                        if (!hasPurchased) {
+                            const price = (await getTokenPrice(parseInt(videoRes.response.data.tokenId))).toString()
+                            const priceInEth = ethers.utils.formatEther(price)
+                            console.log(priceInEth)
+                            setPrice(parseFloat(priceInEth))
+                        }
+                    }
+                    console.log(creatorRes)
+                    setCreator(creatorRes.response.data)
+                })()
             }
         }
-    }, [mounted, router.query, isConnected])
+    }, [mounted, router.query, isConnected, signer])
 
     const postComment = async (e: any) => {
         console.log(comment);
@@ -67,6 +85,29 @@ export default function Watchstream() {
         setComment("")
     }
 
+    const handleBuy = async () => {
+        try {
+            await mintToken(price.toString(), videoDetails.tokenId)
+            setPurchased(true)
+            toast({
+                title: "NFT Purchased!",
+                description: "You can now watch the video!",
+                status: "success",
+                duration: 9000,
+                isClosable: true,
+            })
+        } catch (e) {
+            console.log(e)
+            toast({
+                title: "Error",
+                description: "Something went wrong!",
+                status: "error",
+                duration: 9000,
+                isClosable: true,
+            })
+        }
+    }
+
     return (
         <>
             <Head>
@@ -75,12 +116,34 @@ export default function Watchstream() {
             <Navbar>
                 <Box display="flex" alignItems={"center"} flexDirection={"column"} minH={"90vh"}>
                     {
-                        videoDetails.videoLink &&
+                        (locked && purchased) && videoDetails.videoLink &&
                         <video controls autoPlay id="videoPlayerWindow">
                             <source
                                 src={videoDetails.videoLink}
                                 type="video/webm"/>
                         </video>
+                    }
+                    {
+                        !locked && videoDetails.videoLink &&
+                        <video controls autoPlay id="videoPlayerWindow">
+                            <source
+                                src={videoDetails.videoLink}
+                                type="video/webm"/>
+                        </video>
+                    }
+                    {
+                        locked && !purchased && (
+                            <div style={{height: 250, paddingTop: 100}}>
+                                <Heading>
+                                    You need to purchase the NFT to watch this video!
+                                </Heading>
+                                <Center>
+                                    <Button colorScheme={"teal"} onClick={handleBuy}>
+                                        Purchase NFT for {price} TFIL
+                                    </Button>
+                                </Center>
+                            </div>
+                        )
                     }
                     {
                         !videoDetails.videoLink &&
@@ -130,11 +193,11 @@ export default function Watchstream() {
                                 </CardBody>
                             </Card>
                         }
-                        {videoDetails?.comments?.map((comment: any) => {
-                            return (
-                                <Comment key={comment.id} id={comment.id} />
-                            )
-                        })}
+                        {/*{videoDetails?.comments?.map((comment: any) => {*/}
+                        {/*    return (*/}
+                        {/*        <Comment key={comment.id} id={comment.id}/>*/}
+                        {/*    )*/}
+                        {/*})}*/}
                     </Stack>
                 </Box>
             </Navbar>

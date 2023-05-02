@@ -8,9 +8,10 @@ export default function Comment({id}: { id: string }) {
     const [comment, setComment] = useState<any>({})
     useEffect(() => {
         if (id)
-            getComment(id).then((res) => {
+            (async () => {
+                const res = await getComment(id)
                 setComment(res.response.data)
-            })
+            })()
     }, [id])
     return (
         <Card>
