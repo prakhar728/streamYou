@@ -7,10 +7,13 @@ import VideoGrid from "../../../components/VideoGrid/index";
 import Head from 'next/head';
 import {useIsMounted} from "../../../hooks/useIsMounted";
 import {getCreator} from "../../../lib/polybase";
+import {useAccount} from "wagmi";
 
 export default function Creator() {
     const router = useRouter()
     const [creatorDetails, setCreatorDetails] = useState<any>({})
+    const [isCreator, setIsCreator] = useState<boolean>(false)
+    const {address} = useAccount()
 
     const mounted = useIsMounted()
     useEffect(() => {
@@ -24,6 +27,9 @@ export default function Creator() {
         const creator = await getCreator(channelId as string)
         console.log(creator.response.data)
         setCreatorDetails(creator.response.data)
+        // @ts-ignore
+        if (address!.toLowerCase() === channelId!.split("-")[0].toLowerCase())
+            setIsCreator(true)
     }
 
     return (
@@ -59,7 +65,8 @@ export default function Creator() {
         </Box> */}
                 <Box w="100%" h="100%" display={"flex"} alignItems={"center"} flexDirection={"column"}
                      justifyContent={"space-evenly"} rowGap={3}>
-                    <Box w="100%" display={"flex"} flexDirection={"row"} justifyContent={"space-between"} padding={25} paddingX={85}>
+                    <Box w="100%" display={"flex"} flexDirection={"row"} justifyContent={"space-between"} padding={25}
+                         paddingX={85}>
                         <Flex>
                             <Box display={"flex"} justifyContent={"center"} alignItems={"center"}>
                                 <Image src={creatorDetails?.image || ""} height={150}
@@ -67,18 +74,21 @@ export default function Creator() {
                             </Box>
                             <Box padding={2} display={"flex"} justifyContent={"space-evenly"} flexDirection={"column"}>
                                 <Heading size={"lg"}>{creatorDetails?.name || "Loading..."}</Heading>
-                                <Text size={"lg"} colorScheme={"gray"}>Creator Id</Text>
+                                <Text size={"lg"} colorScheme={"gray"}>{creatorDetails?.id?.split("-")[0]}</Text>
                                 <Text size={"lg"}>{creatorDetails?.description || "Loading..."}</Text>
                             </Box>
                         </Flex>
                         <Center p={2}>
-                            <Button colorScheme='blue' rightIcon={<AiOutlinePlus/>} size={"lg"}>Create </Button>
+                            {isCreator &&
+                                <Button onClick={() => router.push("/app/videoupload")} colorScheme='blue'
+                                        rightIcon={<AiOutlinePlus/>} size={"lg"}>Create </Button>
+                            }
                         </Center>
                     </Box>
                     <Box w="80%" h="70%">
                         <Heading size={"lg"}>HOME</Heading>
                         <Box w="100%" border={"1px"} borderColor={"black"}></Box>
-                        <VideoGrid videos={creatorDetails?.videos} />
+                        <VideoGrid videos={creatorDetails?.videos}/>
                     </Box>
                 </Box>
             </Navbar>
