@@ -31,6 +31,7 @@ export const useContract = () => {
      * @returns {ethers.Contract}
      * */
     const getContract = (contractAddress: string) => {
+        console.log("contractAddress", contractAddress, signer)
         return new ethers.Contract(contractAddress, streamYouAbi, signer!)
     }
 
@@ -82,7 +83,7 @@ export const useContract = () => {
     const mintToken = async(price: string, tokenId: number) => {
         const contractAddress = await getContractAddress()
         const contract = getContract(contractAddress)
-        const tx = await contract.mintToken(tokenId, {value: ethers.utils.parseEther(price)})
+        const tx = await contract.mint(tokenId, {value: ethers.utils.parseEther(price)})
         await tx.wait()
     }
 
