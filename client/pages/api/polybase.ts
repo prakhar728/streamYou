@@ -137,7 +137,7 @@ export default async function handler(
     const db = signInPolybase();
 
     // Create a collection
-    const createResponse = await db.applySchema(schema);
+    // const createResponse = await db.applySchema(schema);
     // console.log(createResponse);
 
     const body = req.body;

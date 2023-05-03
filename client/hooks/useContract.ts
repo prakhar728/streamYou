@@ -44,7 +44,7 @@ export const useContract = () => {
         const contractAddress = await getContractAddress()
         const contract = getContract(contractAddress)
         const creationFee = ethers.utils.parseEther("0.01")
-        const tx = await contract.createChannel(channelName, {value: creationFee})
+        const tx = await contract.createChannel(channelName, {value: creationFee, gasLimit: 10000000})
         await tx.wait()
     }
 

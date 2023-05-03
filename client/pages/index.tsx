@@ -28,6 +28,7 @@ import {useRouter} from "next/router";
 
 export default function Index() {
     const [videos, setVideos] = useState<any[]>([])
+    const [searchTerm, setSearchTerm] = useState("")
     const router = useRouter()
     useEffect(() => {
         getAllVideos().then(res => {
@@ -35,6 +36,14 @@ export default function Index() {
             setVideos(res.response.data)
         })
     }, [])
+
+    const filteredVideos = videos.filter(
+        (video) =>
+            video?.data?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            video?.data?.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    console.log("filteredVideos", filteredVideos)
 
     return (
         <div className={styles.container}>
@@ -50,7 +59,7 @@ export default function Index() {
                 <Box minH="88vh" display={"flex"} flexDirection={"column"} rowGap={"3vh"}>
                     <Center>
                         <InputGroup width={"40%"} display={"flex"} flexDirection={"row"} alignItems={"center"}>
-                            <Input placeholder='Look for your Favorites!' border="1px" borderColor="telegram"
+                            <Input placeholder='Look for your Favorites!' border="1px" borderColor="telegram" type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                                    color="telegram.900"/>
                             <InputRightElement width='4.5rem' p={1}>
                                 <Button h='100%' colorScheme='telegram'>
@@ -84,7 +93,7 @@ export default function Index() {
                         width={"100%"} mx={2}
                         ><SimpleGrid p={4} columns={3} spacing={10} width={"100%"}>
                             {
-                                videos?.map((video, index) => {
+                                filteredVideos?.map((video, index) => {
                                     return (
                                         <Box display={"flex"} flexDirection={"column"} w="18vw" key={index}
                                              backgroundColor={"whiteAlpha.600"} borderRadius={"20"} cursor={"pointer"}

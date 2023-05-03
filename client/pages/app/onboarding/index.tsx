@@ -21,11 +21,14 @@ import {useContract} from "../../../hooks/useContract";
 import {createCreator} from "../../../lib/polybase";
 import {useAccount} from "wagmi";
 import lighthouseUpload from "../../../lib/lightHouseUploadFile";
+import {useCreatorContext} from "../../../contexts/CreatorContext";
 
 export default function Index() {
     const toast = useToast()
     const {address} = useAccount()
     const {createChannel, getChainId, channelExists} = useContract()
+    const {creatorId} = useCreatorContext()
+
     const [loading, setLoading] = useState(false)
     const [selectedFile, setSelectedFile] = useState<File>()
     const [progressBarValue, setprogressBarValue] = useState(0);
@@ -111,10 +114,10 @@ export default function Index() {
             return
         }
         try{
+            console.log(creatorId)
             await createChannel(form.title)
-            const chainId = await getChainId()
             const polybaseRes = await createCreator({
-                id: `${address!}-${chainId}`,
+                id: creatorId as `0x${string}`,
                 name: form.title,
                 description: form.description,
                 image: imageLink,

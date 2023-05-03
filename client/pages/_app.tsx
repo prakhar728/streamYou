@@ -1,11 +1,12 @@
 import '../styles/globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
-import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
-import type { AppProps } from 'next/app';
+import {getDefaultWallets, RainbowKitProvider} from '@rainbow-me/rainbowkit';
+import type {AppProps} from 'next/app';
 import {Chain, configureChains, createClient, useQueryClient, WagmiConfig} from 'wagmi';
-import { goerli,polygonMumbai,filecoinHyperspace } from 'wagmi/chains';
-import { publicProvider } from 'wagmi/providers/public';
-import { ChakraProvider } from '@chakra-ui/react'
+import {goerli, polygonMumbai, filecoinHyperspace} from 'wagmi/chains';
+import {publicProvider} from 'wagmi/providers/public';
+import {ChakraProvider} from '@chakra-ui/react'
+import {CreatorProvider} from "../contexts/CreatorContext";
 
 const sharedeumLiberty: Chain = {
     name: 'Sharedeum Liberty',
@@ -47,39 +48,41 @@ const mantleTestnet: Chain = {
     network: "mantle",
 }
 
-const { chains, provider, webSocketProvider } = configureChains(
-  [
-    polygonMumbai,
-    filecoinHyperspace,
-    ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true' ? [goerli ] : []),
-  ],
-  [publicProvider()]
+const {chains, provider, webSocketProvider} = configureChains(
+    [
+        polygonMumbai,
+        filecoinHyperspace,
+        ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true' ? [goerli] : []),
+    ],
+    [publicProvider()]
 );
 
-const { connectors } = getDefaultWallets({
-  appName: 'StreamYou',
-  projectId: process.env.NEXT_PUBLIC_RAINBOW_KIT,
-  chains,
+const {connectors} = getDefaultWallets({
+    appName: 'StreamYou',
+    projectId: process.env.NEXT_PUBLIC_RAINBOW_KIT,
+    chains,
 });
 
 const wagmiClient = createClient({
-  autoConnect: true,
-  connectors,
-  provider,
-  webSocketProvider,
+    autoConnect: true,
+    connectors,
+    provider,
+    webSocketProvider,
 });
 
 
-function MyApp({ Component, pageProps }: AppProps) {
-  return (
-    <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains}>
-      <ChakraProvider>
-        <Component {...pageProps} />
-        </ChakraProvider>
-      </RainbowKitProvider>
-    </WagmiConfig>
-  );
+function MyApp({Component, pageProps}: AppProps) {
+    return (
+        <WagmiConfig client={wagmiClient}>
+            <RainbowKitProvider chains={chains}>
+                <CreatorProvider>
+                    <ChakraProvider>
+                        <Component {...pageProps} />
+                    </ChakraProvider>
+                </CreatorProvider>
+            </RainbowKitProvider>
+        </WagmiConfig>
+    );
 }
 
 export default MyApp;
