@@ -1,18 +1,12 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
-
+import Navbar from "../components/NavBar/NavBar";
+import { Box, Button, ButtonGroup, Center, HStack, Heading, Image, Input, InputGroup, InputLeftAddon, InputRightAddon, InputRightElement, Show, SimpleGrid, Text } from '@chakra-ui/react';
+import { GoSearch } from "react-icons/go";
 const Home: NextPage = () => {
 
-    /*
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        console.log(name);
-        const file = jsonToFile({name}, "name.json");
-        const res = await uploadSpheron(file)
-        console.log({res});
-    }
-    */
+
 
   return (
     <div className={styles.container}>
@@ -24,7 +18,105 @@ const Home: NextPage = () => {
         />
         <link href="/favicon.ico" rel="icon" />
       </Head>
-    </div>
+      <Navbar>
+        <Box minH="88vh" display={"flex"} flexDirection={"column"} rowGap={"3vh"}>
+          <Center>
+            <InputGroup width={"40%"} display={"flex"} flexDirection={"row"} alignItems={"center"}   >
+              <Input placeholder='Look for your Favorites!' border="1px" borderColor="telegram" color="telegram.900" />
+              <InputRightElement width='4.5rem' p={1}>
+                <Button h='100%' colorScheme='telegram' >
+                  <GoSearch />
+                </Button>
+              </InputRightElement>
+            </InputGroup>
+          </Center>
+          <HStack justifyContent={"center"}  >
+            <ButtonGroup colorScheme='linkedin'  >
+              <Button>All</Button>
+              <Button>Gaming</Button>
+              <Button>Riding</Button>
+              <Button>Exotic</Button>
+              <Show breakpoint='(max-width: 900px)'>
+              <Button>Interesting</Button>
+              <Button>Books</Button>
+              <Button>Astronomy</Button>
+              <Button>Live</Button>
+              <Button>Animated</Button>
+              <Button>Comedy</Button>
+              <Button>Anime</Button>
+              <Button>All</Button>
+              <Button>Gaming</Button>
+              <Button>Riding</Button>
+              </Show>
+            </ButtonGroup>
+          </HStack>
+          <SimpleGrid columns={4} spacing={10} p={3}>
+            <Box w="18vw"display={"flex"} flexDirection={"column"} justifyContent={"space-evenly"}>
+              <Box>
+                <Image src={"https://wallpaperaccess.com/full/3458146.jpg"} alt="Thumbnail"
+                  objectFit='cover' borderRadius={"20px"} />
+              </Box>
+              <Box display={"flex"} flexDirection={"row"} justifyContent={"space-evenly"}>
+                <Center padding={1}>
+                  <Image src={"https://cdn.dribbble.com/users/7918221/screenshots/15705301/media/de6064f59fd30cc8b315c5e827c01d06.jpg"} borderRadius={"50%"} w="3vw" h="3vw" />
+                </Center>
+                <Box w="80">
+                  <Heading size="lg">Title of the Video</Heading>
+                  <Text>Creator Name</Text>
+                </Box>
+              </Box>
+            </Box>
+            <Box w="18vw" display={"flex"} flexDirection={"column"} justifyContent={"space-evenly"}>
+              <Box>
+                <Image src={"https://wallpaperaccess.com/full/3458146.jpg"} alt="Thumbnail"
+                  objectFit='cover' borderRadius={"20px"} />
+              </Box>
+              <Box display={"flex"} flexDirection={"row"} justifyContent={"space-evenly"}>
+                <Center padding={1}>
+                  <Image src={"https://cdn.dribbble.com/users/7918221/screenshots/15705301/media/de6064f59fd30cc8b315c5e827c01d06.jpg"} borderRadius={"50%"} w="3vw" h="3vw" />
+                </Center>
+                <Box w="80">
+                  <Heading size="lg">Title of the Video</Heading>
+                  <Text>Creator Name</Text>
+                </Box>
+              </Box>
+            </Box>
+            <Box w="18vw" display={"flex"} flexDirection={"column"} justifyContent={"space-evenly"}>
+              <Box>
+                <Image src={"https://wallpaperaccess.com/full/3458146.jpg"} alt="Thumbnail"
+                  objectFit='cover' borderRadius={"20px"} />
+              </Box>
+              <Box display={"flex"} flexDirection={"row"} justifyContent={"space-evenly"}>
+                <Center padding={1}>
+                  <Image src={"https://cdn.dribbble.com/users/7918221/screenshots/15705301/media/de6064f59fd30cc8b315c5e827c01d06.jpg"} borderRadius={"50%"} w="3vw" h="3vw" />
+                </Center>
+                <Box w="80">
+                  <Heading size="lg">Title of the Video</Heading>
+                  <Text>Creator Name</Text>
+                </Box>
+              </Box>
+            </Box>
+            <Box w="18vw" display={"flex"} flexDirection={"column"} justifyContent={"space-evenly"}>
+              <Box>
+                <Image src={"https://wallpaperaccess.com/full/3458146.jpg"} alt="Thumbnail"
+                  objectFit='cover' borderRadius={"20px"} />
+              </Box>
+              <Box display={"flex"} flexDirection={"row"} justifyContent={"space-evenly"}>
+                <Center padding={1}>
+                  <Image src={"https://cdn.dribbble.com/users/7918221/screenshots/15705301/media/de6064f59fd30cc8b315c5e827c01d06.jpg"} borderRadius={"50%"} w="3vw" h="3vw" />
+                </Center>
+                <Box w="80">
+                  <Heading size="lg">Title of the Video</Heading>
+                  <Text>Creator Name</Text>
+                </Box>
+              </Box>
+            </Box>
+            
+            
+          </SimpleGrid>
+        </Box>
+      </Navbar>
+    </div >
   );
 };
 

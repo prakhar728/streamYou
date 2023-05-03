@@ -230,7 +230,7 @@ export default function Index() {
                 <title>Upload Video</title>
             </Head>
             <Navbar>
-                <Center w="100%" h="80vh" border={"1px"} borderColor={"black"}>
+                <Center w="100%" h="80vh">
                     <Stack flexDirection={"column"} border={"1px"} borderColor={"black"} borderRadius={"20px"} w="70%"
                            h="70%" p={"8px"} alignItems={"center"}>
                         <Stack flexDirection={"row"} justifyContent={"space-between"} h="30%" alignItems={"center"}
@@ -310,7 +310,7 @@ export default function Index() {
                         </Stack>
                         <Stack direction='row' justifyContent='center' h="8.5%">
                             <Box w='80%'>
-                                <Button isLoading={loading} type="submit" colorScheme="teal" size="lg" fontSize={'2xl'}
+                                <Button isLoading={loading} type="submit" colorScheme="telegram" p={4} size="lg" fontSize={'2xl'}
                                         h='80%' onClick={onSubmit}>
                                     Submit
                                 </Button>

@@ -18,8 +18,13 @@ export default function Room() {
         if (process.env.NEXT_PUBLIC_PROJECT_ID)
             initialize(process.env.NEXT_PUBLIC_PROJECT_ID);
     }, []);
+
+   
+    
     const router = useRouter();
     const {roomid} = router.query;
+    console.log(  );
+    
     const {joinLobby, leaveLobby} = useLobby();
     const {
         startRecording,
@@ -50,6 +55,16 @@ export default function Room() {
 
     //ALL THE EVENT LISTENERS
 
+    useEffect(() => {
+        console.log("Running",joinLobby.isCallable );
+
+        if(!joinLobby.isCallable && roomid && typeof(roomid)==="string") 
+        {
+            console.log("Running",joinLobby.isCallable );
+            
+            joinLobby(roomid)
+        }
+    }, [])
     useEventListener("lobby:joined", () => {
         toast({
             title: 'LOBBY JOINED!',

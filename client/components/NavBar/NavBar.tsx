@@ -31,21 +31,25 @@ import {
   FiSettings,
   FiMenu,
   FiBell,
+  
   FiChevronDown,
 } from 'react-icons/fi';
+import {AiOutlineDashboard} from "react-icons/ai";
+import {BsCameraVideo} from "react-icons/bs";
 import { IconType } from 'react-icons';
 import { ReactText } from 'react';
 
 interface LinkItemProps {
   name: string;
   icon: IconType;
+  path:string;
 }
 const LinkItems: Array<LinkItemProps> = [
-  { name: 'Home', icon: FiHome },
-  { name: 'Trending', icon: FiTrendingUp },
-  { name: 'Explore', icon: FiCompass },
-  { name: 'Favourites', icon: FiStar },
-  { name: 'Settings', icon: FiSettings },
+  { name: 'Home', icon: FiHome,path:"/" },
+  { name: 'Explore', icon: FiCompass,path:"" },
+  { name: 'Favourites', icon: FiStar,path:"" },
+  { name: 'Dashboard', icon: AiOutlineDashboard,path:"/app/creator" },
+  { name: 'Record!', icon: BsCameraVideo,path:"/app/videoupload" },
 ];
 
 export default function SidebarWithHeader({
@@ -104,7 +108,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
       {LinkItems.map((link) => (
-        <NavItem key={link.name} icon={link.icon}>
+        <NavItem key={link.name} link={link.path} icon={link.icon} >
           {link.name}
         </NavItem>
       ))}
@@ -114,11 +118,12 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 
 interface NavItemProps extends FlexProps {
   icon: IconType;
+  link:string;
   children: ReactText;
 }
-const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
+const NavItem = ({ icon,link, children, ...rest }: NavItemProps) => {
   return (
-    <Link href="#" style={{ textDecoration: 'none' }} _focus={{ boxShadow: 'none' }}>
+    <Link href={link} style={{ textDecoration: 'none' }} _focus={{ boxShadow: 'none' }}>
       <Flex
         align="center"
         p="4"
