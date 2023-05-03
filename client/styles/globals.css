@@ -26,3 +26,12 @@ border:1px solid rgba(0, 0, 0, 0.357);
   height: "5vh";
   border-radius: "20px";
   }
+  #videoStream{
+    width:40vw;
+    height:"60vh";
+    border:1px solid black;
+  }
+  #videoStreamBot{
+    border:2px solid black;
+    width: 50vw;
+  }
