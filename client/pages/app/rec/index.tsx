@@ -5,6 +5,7 @@ import {Audio, Video} from "@huddle01/react/components";
 import {usePeers} from "@huddle01/react/hooks";
 import {useRecorder} from "@huddle01/react/app-utils";
 import {useRouter} from "next/router";
+import { Box, Center } from "@chakra-ui/react";
 
 const App = () => {
     const router = useRouter();
@@ -21,10 +22,9 @@ const App = () => {
     useRecorder(roomId, process.env.NEXT_PUBLIC_PROJECT_ID || "");
 
     return (
-        <div className="grid grid-cols-2">
-            <div>
-                Peers:
-                <div className="grid grid-cols-4">
+        <Center w="100vw" >
+            <Center >
+                <Center>
                     {Object.values(peers)
                         .filter((peer) => peer.cam)
                         .map((peer) => (
@@ -33,6 +33,7 @@ const App = () => {
                                 peerId={peer.peerId}
                                 track={peer.cam}
                                 // debug
+                                id="videoStreamBot"
                             />
                         ))}
                     {Object.values(peers)
@@ -40,9 +41,9 @@ const App = () => {
                         .map((peer) => (
                             <Audio key={peer.peerId} peerId={peer.peerId} track={peer.mic}/>
                         ))}
-                </div>
-            </div>
-        </div>
+                </Center>
+            </Center>
+        </Center>
     );
 };
 
