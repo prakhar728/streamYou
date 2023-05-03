@@ -51,8 +51,6 @@ const { chains, provider, webSocketProvider } = configureChains(
   [
     polygonMumbai,
     filecoinHyperspace,
-    sharedeumLiberty,
-    mantleTestnet,
     ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true' ? [goerli ] : []),
   ],
   [publicProvider()]
