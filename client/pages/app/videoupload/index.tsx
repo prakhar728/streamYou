@@ -16,9 +16,6 @@ import {
 } from '@chakra-ui/react';
 import {AiOutlineCloseCircle} from 'react-icons/ai';
 import HuddleLogo from "../../../assets/HuddleLogo.webp";
-import Link from 'next/link';
-import {Link as ChakraLink} from '@chakra-ui/react';
-import LightHouseSDK from "../../../assets/lightHouseLogo.svg"
 import Image from 'next/image';
 import axios, {AxiosHeaderValue} from 'axios';
 import {useAccount} from 'wagmi'
@@ -33,7 +30,7 @@ import {uploadLighthouse} from "../../../lib/uploadLighthouse";
 import {jsonToFile} from "../../../lib/jsonToFile";
 import {useCreatorContext} from "../../../contexts/CreatorContext";
 
-export default function Index() {
+export default function Videoupload() {
     const {address} = useAccount()
     const router = useRouter();
     const toast = useToast()
@@ -74,13 +71,15 @@ export default function Index() {
     }, [selectedFile])
 
     useEffect(() => {
-        if (localStorage.getItem("recordingData") !== null) {
-            // @ts-ignore
-            const recordingData = JSON.parse(localStorage.getItem("recordingData"))
-            setLightHouseLink(recordingData.s3link)
-            setHuddleExists(true)
+        if (window !== undefined) {
+            if (localStorage.getItem("recordingData") !== null) {
+                // @ts-ignore
+                const recordingData = JSON.parse(localStorage.getItem("recordingData"))
+                setLightHouseLink(recordingData.s3link)
+                setHuddleExists(true)
+            }
         }
-    }, [localStorage])
+    }, [])
 
     useEffect(() => {
         if (progressBarValue == 100) {
