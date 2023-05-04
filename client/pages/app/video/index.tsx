@@ -1,17 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/router'
+import React, {useEffect, useRef, useState} from 'react'
+import {useRouter} from 'next/router'
 import Navbar from "../../../components/NavBar/NavBar";
-import { Box, Button, Center, Stack } from '@chakra-ui/react';
-import { useEventListener, useHuddle01 } from '@huddle01/react';
-import { useAudio, useLobby, useRecording, useRoom, useVideo } from '@huddle01/react/hooks';
-import { Audio, Video } from '@huddle01/react/components';
-import { useToast } from '@chakra-ui/react'
+import {Box, Button, Center, Stack} from '@chakra-ui/react';
+import {useEventListener, useHuddle01} from '@huddle01/react';
+import {useAudio, useLobby, useRecording, useRoom, useVideo} from '@huddle01/react/hooks';
+import {Audio, Video} from '@huddle01/react/components';
+import {useToast} from '@chakra-ui/react'
 
 export default function Room() {
     const toast = useToast();
     const videoRef = useRef<HTMLVideoElement>(null);
     const [camOn, setcamOn] = useState(false);
-    const { initialize, isInitialized } = useHuddle01();
+    const {initialize, isInitialized} = useHuddle01();
     useEffect(() => {
         // its preferable to use env vars to store projectId
         console.log(process.env.NEXT_PUBLIC_PROJECT_ID);
@@ -21,12 +21,11 @@ export default function Room() {
     }, []);
 
 
-
     const router = useRouter();
-    const { roomid } = router.query;
+    const {roomid} = router.query;
     console.log();
 
-    const { joinLobby, leaveLobby } = useLobby();
+    const {joinLobby, leaveLobby} = useLobby();
     const {
         startRecording,
         stopRecording,
@@ -52,12 +51,11 @@ export default function Room() {
         stopProducingVideo,
         stream: videoStream
     } = useVideo();
-    const { joinRoom, leaveRoom, isLoading, isRoomJoined, error } = useRoom();
+    const {joinRoom, leaveRoom, isLoading, isRoomJoined, error} = useRoom();
 
     //ALL THE EVENT LISTENERS
 
-  
-   
+
     useEventListener("lobby:joined", () => {
         toast({
             title: 'LOBBY JOINED!',
@@ -101,7 +99,7 @@ export default function Room() {
             isClosable: true,
         })
         setcamOn(false)
-        
+
     });
 
     useEventListener("lobby:mic-on", () => {
@@ -172,26 +170,55 @@ export default function Room() {
             isClosable: true,
         })
     });
+
+    const handleStartRecording = async () => {
+        if (joinLobby.isCallable) {
+            await joinLobby(roomid as string);
+            if (fetchVideoStream.isCallable) {
+                await fetchVideoStream();
+                if (fetchAudioStream.isCallable) {
+                    await fetchAudioStream();
+                    if (joinRoom.isCallable) {
+                        await joinRoom()
+                        if (produceVideo.isCallable) {
+                            await produceVideo(videoStream)
+                            if (produceAudio.isCallable) {
+                                await produceAudio(audioStream)
+                                setTimeout(() => {
+                                    console.log(`${process.env.NEXT_PUBLIC_BASE_URL}app/rec?roomId=${roomid}`);
+                                    startRecording(`${process.env.NEXT_PUBLIC_BASE_URL}app/rec?roomId=${roomid}`)
+                                }, 10000)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     if (roomid && typeof (roomid) == "string")
         return (
             <Navbar>
                 <Box border="1px" borderColor={"black"} h='85vh'>
-                    <Box h='100%' border="1px" borderColor={"black"} display={"flex"} flexDirection={"column"} alignItems={"center"} >
+                    <Box h='100%' border="1px" borderColor={"black"} display={"flex"} flexDirection={"column"}
+                         alignItems={"center"}>
                         {/* {(joinLobby.isCallable && fetchVideoStream.isCallable)  && <Center w="40vw" border="1px" borderColor={"black"} h="60vh">
                             Your Video is off!
                         </Center>}
                         {!fetchVideoStream.isCallable && !joinLobby.isCallable && <video ref={videoRef} autoPlay muted id="videoStream"></video>} */}
-                        {!fetchVideoStream.isCallable && !joinLobby.isCallable ?<video ref={videoRef} autoPlay muted id="videoStream"></video>:<Center w="40vw" border="1px" borderColor={"black"} h="60vh">
-                            Your Video is off!
-                        </Center>}
+                        {!fetchVideoStream.isCallable && !joinLobby.isCallable ?
+                            <video ref={videoRef} autoPlay muted id="videoStream"></video> :
+                            <Center w="40vw" border="1px" borderColor={"black"} h="60vh">
+                                Your Video is off!
+                            </Center>}
                         <Stack h='20%' columnGap={"2vw"} flexDirection={'row'}
-                            alignItems={'center'} justifyContent={'space-evenly'} flexWrap={'wrap'} w="80%">
+                               alignItems={'center'} justifyContent={'space-evenly'} flexWrap={'wrap'} w="80%">
                             <Button isDisabled={!joinLobby.isCallable}
-                                onClick={() => joinLobby(roomid)} colorScheme='blue'>
+                                    onClick={() => joinLobby(roomid)} colorScheme='blue'>
                                 Join Lobby
                             </Button>
                             <Button isDisabled={joinLobby.isCallable}
-                                onClick={() => leaveLobby()} colorScheme='blue'>
+                                    onClick={() => leaveLobby()} colorScheme='blue'>
                                 Leave Lobby
                             </Button>
                             <Button isDisabled={!joinRoom.isCallable} onClick={joinRoom} colorScheme='blue'>
@@ -203,48 +230,47 @@ export default function Room() {
                                 LEAVE_ROOM
                             </Button>
                             <Button isDisabled={!fetchAudioStream.isCallable} onClick={fetchAudioStream}
-                                colorScheme='blue'>
+                                    colorScheme='blue'>
                                 FETCH_AUDIO_STREAM
                             </Button>
 
                             <Button isDisabled={fetchAudioStream.isCallable} onClick={stopAudioStream}
-                                colorScheme='blue'>
+                                    colorScheme='blue'>
                                 STOP AUDIO STREAM
                             </Button>
                             {/* Webcam */}
                             <Button isDisabled={!fetchVideoStream.isCallable} onClick={fetchVideoStream}
-                                colorScheme='blue'>
+                                    colorScheme='blue'>
                                 FETCH_VIDEO_STREAM
                             </Button>
                             <Button isDisabled={!stopVideoStream.isCallable} onClick={stopVideoStream}
-                                colorScheme='blue'>
+                                    colorScheme='blue'>
                                 STOP VIDEO STREAM
                             </Button>
                             <Button colorScheme='blue' isDisabled={!produceVideo.isCallable}
-                                onClick={() => produceVideo(videoStream)}>
+                                    onClick={() => produceVideo(videoStream)}>
                                 Produce Cam
                             </Button>
 
                             <Button colorScheme='blue' isDisabled={!produceAudio.isCallable}
-                                onClick={() => produceAudio(audioStream)}>
+                                    onClick={() => produceAudio(audioStream)}>
                                 Produce Mic
                             </Button>
 
                             <Button colorScheme='blue' isDisabled={!stopProducingVideo.isCallable}
-                                onClick={stopProducingVideo}>
+                                    onClick={stopProducingVideo}>
                                 Stop Producing Cam
                             </Button>
 
                             <Button colorScheme='blue' isDisabled={!stopProducingAudio.isCallable}
-                                onClick={stopProducingAudio}>
+                                    onClick={stopProducingAudio}>
                                 Stop Producing Mic
                             </Button>
 
                             <Button disabled={!startRecording.isCallable} onClick={() => {
-                                console.log(`${process.env.NEXT_PUBLIC_BASE_URL}app/rec?roomId=${roomid}`);
-                                startRecording(`${process.env.NEXT_PUBLIC_BASE_URL}app/rec?roomId=${roomid}`)
+                                handleStartRecording();
                             }}
-                                colorScheme='blue'>
+                                    colorScheme='blue'>
                                 START_RECORDING
                             </Button>
 
