@@ -50,6 +50,7 @@ const mantleTestnet: Chain = {
 
 const {chains, provider, webSocketProvider} = configureChains(
     [
+        filecoinHyperspace,
         mantleTestnet,
         sharedeumLiberty,
         ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true' ? [goerli] : []),
