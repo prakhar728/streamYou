@@ -20,19 +20,13 @@ import {uploadSpheron} from "../../../lib/uploadSpheron";
 import {useContract} from "../../../hooks/useContract";
 import {createCreator} from "../../../lib/polybase";
 import {useAccount} from "wagmi";
-import lighthouseUpload from "../../../lib/lightHouseUploadFile";
-import {useCreatorContext} from "../../../contexts/CreatorContext";
 
 export default function Index() {
     const toast = useToast()
     const {address} = useAccount()
     const {createChannel, getChainId, channelExists} = useContract()
-    const {creatorId} = useCreatorContext()
-
     const [loading, setLoading] = useState(false)
     const [selectedFile, setSelectedFile] = useState<File>()
-    const [progressBarValue, setprogressBarValue] = useState(0);
-    const [imageLink, setImageLink] = useState<string>('')
     const [form, setForm] = useState({
         title: '',
         description: '',
@@ -65,26 +59,6 @@ export default function Index() {
             return
         }
         setSelectedFile(e.target.files[0])
-        uploadFile(e)
-    }
-
-    const progressCallback = (progressData: any) => {
-        let completedTillNow = (progressData?.total / progressData?.uploaded)?.toFixed(2);
-        console.log(completedTillNow);
-
-        let percentageDone =
-            100 - parseInt(completedTillNow);
-        setprogressBarValue(percentageDone);
-        console.log(percentageDone);
-    };
-    const uploadFile = async (e: any) => {
-        e.persist()
-
-        if (process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY) {
-            const output = await lighthouseUpload(e, process.env.NEXT_PUBLIC_LIGHTHOUSE_KEY, progressCallback);
-            console.log('File Status:', output);
-            setImageLink(`https://ipfs.io/ipfs/${output?.data.Hash}`)
-        }
     }
 
     const onSubmit = async (e: any) => {
@@ -113,11 +87,14 @@ export default function Index() {
             setLoading(false)
             return
         }
+        const uploadRes = await uploadSpheron(selectedFile)
+        const imageLink = `${uploadRes!.protocolLink}/${selectedFile.name}`
+        console.log(imageLink)
         try{
-            console.log(creatorId)
             await createChannel(form.title)
+            const chainId = await getChainId()
             const polybaseRes = await createCreator({
-                id: creatorId as `0x${string}`,
+                id: `${address!}-${chainId}`,
                 name: form.title,
                 description: form.description,
                 image: imageLink,
@@ -153,61 +130,61 @@ export default function Index() {
                     <Center h='80vh'>
                         <Box w={[600, 500, 900]} h={['80%']}>
                             {/*<form>*/}
-                                <Stack direction='column' justifyContent={'space-evenly'} border='1px'
-                                       borderColor='gray.400'
-                                       h='100%' borderRadius={'24'}>
-                                    <Stack direction='row' justifyContent={'space-evenly'} h='30%'>
-                                        <Stack>
-                                            <FormControl display="flex" flexDirection={'column'} h='100%'
-                                                         justifyContent={'space-evenly'}>
-                                                {selectedFile &&
-                                                    <HStack boxSize='100%' fontSize={'4xl'}>
-                                                        <Image src={preview} boxSize='100%' fit={'contain'}/>
-                                                        <AiOutlineCloseCircle onClick={resetFile} fontSize={'4xl'}/>
-                                                    </HStack>
-                                                }
-                                                {!selectedFile && <>
-                                                    <FormLabel>Upload Image Here</FormLabel>
-                                                    <Input required placeholder='Upload your Images' type='file' h='80%'
-                                                           textAlign={'center'} onChange={onSelectFile}/>
-                                                </>}
+                            <Stack direction='column' justifyContent={'space-evenly'} border='1px'
+                                   borderColor='gray.400'
+                                   h='100%' borderRadius={'24'}>
+                                <Stack direction='row' justifyContent={'space-evenly'} h='30%'>
+                                    <Stack>
+                                        <FormControl display="flex" flexDirection={'column'} h='100%'
+                                                     justifyContent={'space-evenly'}>
+                                            {selectedFile &&
+                                                <HStack boxSize='100%' fontSize={'4xl'}>
+                                                    <Image src={preview} boxSize='100%' fit={'contain'}/>
+                                                    <AiOutlineCloseCircle onClick={resetFile} fontSize={'4xl'}/>
+                                                </HStack>
+                                            }
+                                            {!selectedFile && <>
+                                                <FormLabel>Upload Image Here</FormLabel>
+                                                <Input required placeholder='Upload your Images' type='file' h='80%'
+                                                       textAlign={'center'} onChange={onSelectFile}/>
+                                            </>}
 
-                                            </FormControl>
-                                        </Stack>
-                                        <VStack justifyContent={'space-between'}>
-                                            <FormControl>
-                                                <FormLabel>Channel Name</FormLabel>
-                                                <Input required placeholder='Fantastic Rider' onChange={
-                                                    (e) => setForm({...form, title: e.target.value})
-                                                } />
-                                            </FormControl>
-                                            {/* ADD BOOLEAN CHECKBOX */}
-                                            <FormControl>
-                                                <FormLabel>Nft Contract Address</FormLabel>
-                                                <Checkbox defaultChecked onChange={
-                                                    (e) => setForm({...form, nft: e.target.checked})
-                                                }>Create NFT to token gate your content</Checkbox>
-                                            </FormControl>
+                                        </FormControl>
+                                    </Stack>
+                                    <VStack justifyContent={'space-between'}>
+                                        <FormControl>
+                                            <FormLabel>Channel Name</FormLabel>
+                                            <Input required placeholder='Fantastic Rider' onChange={
+                                                (e) => setForm({...form, title: e.target.value})
+                                            } />
+                                        </FormControl>
+                                        {/* ADD BOOLEAN CHECKBOX */}
+                                        <FormControl>
+                                            <FormLabel>Nft Contract Address</FormLabel>
+                                            <Checkbox defaultChecked onChange={
+                                                (e) => setForm({...form, nft: e.target.checked})
+                                            }>Create NFT to token gate your content</Checkbox>
+                                        </FormControl>
 
-                                        </VStack>
-                                    </Stack>
-                                    <Stack direction='row' justifyContent={'center'} h='40%'>
-                                        <Box w='80%'>
-                                            <FormLabel>Channel Description</FormLabel>
-                                            <Textarea required placeholder='Channel Description' size='lg' h='80%'  onChange={
-                                                (e) => setForm({...form, description: e.target.value})
-                                            }/>
-                                        </Box>
-                                    </Stack>
-                                    <Stack direction='row' justifyContent='center' h="7.5%">
-                                        <Box w='80%'>
-                                            <Button isLoading={loading} type="submit" colorScheme="teal" size="lg" fontSize={'2xl'}
-                                                    h='80%' onClick={onSubmit}>
-                                                Submit
-                                            </Button>
-                                        </Box>
-                                    </Stack>
+                                    </VStack>
                                 </Stack>
+                                <Stack direction='row' justifyContent={'center'} h='40%'>
+                                    <Box w='80%'>
+                                        <FormLabel>Channel Description</FormLabel>
+                                        <Textarea required placeholder='Channel Description' size='lg' h='80%'  onChange={
+                                            (e) => setForm({...form, description: e.target.value})
+                                        }/>
+                                    </Box>
+                                </Stack>
+                                <Stack direction='row' justifyContent='center' h="7.5%">
+                                    <Box w='80%'>
+                                        <Button isLoading={loading} type="submit" colorScheme="teal" size="lg" fontSize={'2xl'}
+                                                h='80%' onClick={onSubmit}>
+                                            Submit
+                                        </Button>
+                                    </Box>
+                                </Stack>
+                            </Stack>
                             {/*</form>*/}
                         </Box>
                     </Center>

@@ -32,6 +32,7 @@ import Head from "next/head";
 import {uploadLighthouse} from "../../../lib/uploadLighthouse";
 import {jsonToFile} from "../../../lib/jsonToFile";
 import {useCreatorContext} from "../../../contexts/CreatorContext";
+import {uploadSpheron} from "../../../lib/uploadSpheron";
 
 export default function Index() {
     const {address} = useAccount()
@@ -40,7 +41,7 @@ export default function Index() {
     const {createToken, getChainId, getCurrentToken} = useContract()
     const {creatorId, isCreator} = useCreatorContext()
 
-    const [selectedFile, setSelectedFile] = useState()
+    const [selectedFile, setSelectedFile] = useState<File>()
     const [preview, setPreview] = useState<string | undefined>('');
     const [progressBarValue, setprogressBarValue] = useState(0)
     const [loading, setLoading] = useState(false)
@@ -197,8 +198,8 @@ export default function Index() {
             })
             return
         }
-        const thumbnail = await uploadLighthouse([selectedFile])
-        const thumbnailLink = `https://gateway.lighthouse.storage/ipfs/${thumbnail.data.Hash}`
+        const uploadRes = await uploadSpheron(selectedFile)
+        const thumbnailLink = `${uploadRes!.protocolLink}/${selectedFile.name}`
         console.log({thumbnailLink, lightHouseLink})
         let polybaseData = {
             id: `${channelName}-${form.title}`,
@@ -220,8 +221,8 @@ export default function Index() {
                 external_url: lightHouseLink,
             }
             const metadataFile = jsonToFile(metadata, 'metadata.json')
-            const metadataHash = await uploadLighthouse([metadataFile])
-            const metadataLink = `https://gateway.lighthouse.storage/ipfs/${metadataHash.data.Hash}`
+            const uploadRes = await uploadSpheron(metadataFile)
+            const metadataLink = `${uploadRes!.protocolLink}/metadata.json`
             console.log(metadataLink)
             await createToken(channelName, metadataLink, form.price)
             const token = await getCurrentToken()

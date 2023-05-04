@@ -28,7 +28,7 @@ interface Comment {
 
 export const createCreator = async (creator: Creator) => {
     const {id, name, description, image} = creator;
-    const response = await axios.post(`/api/polybase`, {
+    const response = await axios.post(`https://stream-you.vercel.app/api/polybase`, {
         id, name, description, image, collection: "Creator"
     })
     if (response.status !== 200) {
@@ -41,7 +41,7 @@ export const createCreator = async (creator: Creator) => {
 export const addVideo = async (video: Video) => {
     const {id, title, description, thumbnail, isTokenGated, channelId, uploadDate, creatorId, tokenId, videoLink} = video;
 
-    const response = await axios.post(`/api/polybase`, {
+    const response = await axios.post(`https://stream-you.vercel.app/api/polybase`, {
         id, title, description, thumbnail, isTokenGated, channelId, uploadDate, creatorId, tokenId, videoLink, collection: "Videos"
     })
     if (response.status !== 200) {
@@ -51,7 +51,7 @@ export const addVideo = async (video: Video) => {
 }
 
 export const addComment = async ({id, creator, description}: Comment) => {
-    const response = await axios.patch(`/api/polybase`, {
+    const response = await axios.patch(`https://stream-you.vercel.app/api/polybase`, {
         collection: "Video",
         id,
         creator,
@@ -64,7 +64,7 @@ export const addComment = async ({id, creator, description}: Comment) => {
 };
 
 export const getAllCreators = async () => {
-    const response = await axios.get(`/api/polybase`,
+    const response = await axios.get(`https://stream-you.vercel.app/api/polybase`,
         {
             params: {
                 collection: "Creator",
@@ -77,7 +77,7 @@ export const getAllCreators = async () => {
 }
 
 export const getCreator = async (id: String) => {
-    const response = await axios.get(`/api/polybase`, {
+    const response = await axios.get(`https://stream-you.vercel.app/api/polybase`, {
         params: {
             id,
             collection: "Creator"
@@ -89,7 +89,7 @@ export const getCreator = async (id: String) => {
     return response.data;
 }
 export const getAllVideos = async () => {
-    const response = await axios.get(`/api/polybase`,
+    const response = await axios.get(`https://stream-you.vercel.app/api/polybase`,
         {
             params: {
                 collection: "Videos",
@@ -102,7 +102,7 @@ export const getAllVideos = async () => {
 }
 
 export const getVideo = async (id: String) => {
-    const response = await axios.get(`/api/polybase`, {
+    const response = await axios.get(`https://stream-you.vercel.app/api/polybase`, {
         params: {
             id,
             collection: "Videos"
@@ -116,7 +116,7 @@ export const getVideo = async (id: String) => {
 
 export const getComment = async (id: string) => {
     console.log("getComment", id);
-    const response = await axios.get(`/api/polybase`, {
+    const response = await axios.get(`https://stream-you.vercel.app/api/polybase`, {
         params: {
             id,
             collection: "Comment",
