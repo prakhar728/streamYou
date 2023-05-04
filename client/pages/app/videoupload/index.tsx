@@ -68,7 +68,7 @@ export default function Videoupload() {
             if (localStorage.getItem("recordingData") !== null) {
                 // @ts-ignore
                 const recordingData = JSON.parse(localStorage.getItem("recordingData"))
-                setLightHouseLink(recordingData.s3link)
+                setLightHouseLink(recordingData.s3URL)
                 setHuddleExists(true)
             }
         }
