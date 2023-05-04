@@ -4,7 +4,7 @@ Empower content creators with a decentralized platform that provides privacy, se
 
 **Problem Solved**
 
-Online content creators often lack control over their content and are forced to rely on centralized platforms that take a large cut of their earnings. Decentralized OnlyFans provides a solution that puts the power back in the hands of creators, enabling them to monetize their work safely and securely.
+Online content creators often lack control over their content and are forced to rely on centralized platforms that take a large cut of their earnings. Decentralized streamYou enables the content creators to establish a true, and personal connection with their fans, helping them monetize their talents safely and securely.
 
 **Challenges Faced**
 
