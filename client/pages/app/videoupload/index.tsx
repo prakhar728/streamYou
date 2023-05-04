@@ -52,13 +52,6 @@ export default function Videoupload() {
     const [count, setCount] = useState(0)
 
     useEffect(() => {
-        if (!isCreator) {
-            alert("You are not a creator. Please create a creator account to upload videos.")
-            router.push("/app/onboarding")
-        }
-    }, [isCreator])
-
-    useEffect(() => {
         if (!selectedFile) {
             setPreview(undefined)
             return
