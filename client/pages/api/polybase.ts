@@ -87,7 +87,7 @@ collection Video{
 
 const signInPolybase = () => {
     const db = new Polybase({
-        defaultNamespace: "streamYou-test-v1.0",
+        defaultNamespace: "streamYou-prod-v1.0",
     });
 
     const wallet = new ethers.Wallet(process.env.PRIVATE_KEY as string);
