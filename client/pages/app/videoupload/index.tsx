@@ -167,6 +167,7 @@ export default function Index() {
                 duration: 3000,
                 isClosable: true,
             })
+            setLoading(false)
             return
         }
         if (!form.title || !form.description || !lightHouseLink) {
@@ -177,6 +178,7 @@ export default function Index() {
                 duration: 3000,
                 isClosable: true,
             })
+            setLoading(false)
             return
         }
         let channelName = ""
@@ -191,6 +193,7 @@ export default function Index() {
                 title: 'Form Submission Failed.',
                 description: "Make sure you have registered as a creator",
             })
+            setLoading(false)
             return
         }
         const uploadRes = await uploadSpheron(selectedFile)
