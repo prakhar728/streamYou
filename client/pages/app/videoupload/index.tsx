@@ -75,13 +75,15 @@ export default function Index() {
     }, [selectedFile])
 
     useEffect(() => {
-        if (localStorage.getItem("recordingData") !== null) {
-            // @ts-ignore
-            const recordingData = JSON.parse(localStorage.getItem("recordingData"))
-            setLightHouseLink(recordingData.s3link)
-            setHuddleExists(true)
+        if (window !== undefined) {
+            if (localStorage.getItem("recordingData") !== null) {
+                // @ts-ignore
+                const recordingData = JSON.parse(localStorage.getItem("recordingData"))
+                setLightHouseLink(recordingData.s3link)
+                setHuddleExists(true)
+            }
         }
-    }, [localStorage])
+    }, [])
 
     useEffect(() => {
         if (progressBarValue == 100) {
