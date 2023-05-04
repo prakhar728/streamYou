@@ -151,7 +151,7 @@ export default function Room() {
 
     useEventListener("room:recording-stopped", () => {
         console.log(recordingData);
-
+        localStorage.setItem("recordingData", JSON.stringify(recordingData));
         toast({
             title: 'RECORDING STOPPED',
             description: "Room Recording is Stopped",
@@ -159,6 +159,9 @@ export default function Room() {
             duration: 4000,
             isClosable: true,
         })
+        setTimeout(() => {
+            router.push("/app/videoupload")
+        }, 4000)
     });
 
     useEventListener("room:failed", () => {
@@ -170,32 +173,6 @@ export default function Room() {
             isClosable: true,
         })
     });
-
-    const handleStartRecording = async () => {
-        if (joinLobby.isCallable) {
-            await joinLobby(roomid as string);
-            if (fetchVideoStream.isCallable) {
-                await fetchVideoStream();
-                if (fetchAudioStream.isCallable) {
-                    await fetchAudioStream();
-                    if (joinRoom.isCallable) {
-                        await joinRoom()
-                        if (produceVideo.isCallable) {
-                            await produceVideo(videoStream)
-                            if (produceAudio.isCallable) {
-                                await produceAudio(audioStream)
-                                setTimeout(() => {
-                                    console.log(`${process.env.NEXT_PUBLIC_BASE_URL}app/rec?roomId=${roomid}`);
-                                    startRecording(`${process.env.NEXT_PUBLIC_BASE_URL}app/rec?roomId=${roomid}`)
-                                }, 10000)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     if (roomid && typeof (roomid) == "string")
         return (
             <Navbar>
@@ -268,7 +245,8 @@ export default function Room() {
                             </Button>
 
                             <Button disabled={!startRecording.isCallable} onClick={() => {
-                                handleStartRecording();
+                                console.log(`${process.env.NEXT_PUBLIC_BASE_URL}app/rec?roomId=${roomid}`);
+                                startRecording(`${process.env.NEXT_PUBLIC_BASE_URL}app/rec?roomId=${roomid}`)
                             }}
                                     colorScheme='blue'>
                                 START_RECORDING
@@ -283,4 +261,3 @@ export default function Room() {
             </Navbar>
         )
 }
-

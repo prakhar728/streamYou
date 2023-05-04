@@ -31,12 +31,14 @@ import {addVideo, getCreator} from "../../../lib/polybase";
 import Head from "next/head";
 import {uploadLighthouse} from "../../../lib/uploadLighthouse";
 import {jsonToFile} from "../../../lib/jsonToFile";
+import {useCreatorContext} from "../../../contexts/CreatorContext";
 
 export default function Index() {
     const {address} = useAccount()
     const router = useRouter();
     const toast = useToast()
     const {createToken, getChainId, getCurrentToken} = useContract()
+    const {creatorId, isCreator} = useCreatorContext()
 
     const [selectedFile, setSelectedFile] = useState()
     const [preview, setPreview] = useState<string | undefined>('');
@@ -49,7 +51,16 @@ export default function Index() {
         price: "0",
     })
     const [lightHouseLink, setLightHouseLink] = useState<string>('')
+    const [huddleExists, setHuddleExists] = useState<boolean>(false)
     const [count, setCount] = useState(0)
+
+    useEffect(() => {
+        if (!isCreator) {
+            alert("You are not a creator. Please create a creator account to upload videos.")
+            router.push("/app/onboarding")
+        }
+    }, [isCreator])
+
     useEffect(() => {
         if (!selectedFile) {
             setPreview(undefined)
@@ -61,6 +72,15 @@ export default function Index() {
         // free memory when ever this component is unmounted
         return () => URL.revokeObjectURL(objectUrl)
     }, [selectedFile])
+
+    useEffect(() => {
+        if (localStorage.getItem("recordingData") !== null) {
+            // @ts-ignore
+            const recordingData = JSON.parse(localStorage.getItem("recordingData"))
+            setLightHouseLink(recordingData.s3link)
+            setHuddleExists(true)
+        }
+    }, [localStorage])
 
     useEffect(() => {
         if (progressBarValue == 100) {
@@ -153,7 +173,7 @@ export default function Index() {
             })
             return
         }
-        if (!form.title || !form.description) {
+        if (!form.title || !form.description || !lightHouseLink) {
             toast({
                 title: 'Form Submission Failed.',
                 description: "Please Fill all the Fields",
@@ -163,10 +183,8 @@ export default function Index() {
             })
             return
         }
-        let channelName = "", creatorId = ""
+        let channelName = ""
         try {
-            const chainId = await getChainId()
-            creatorId = `${address}-${chainId}`
             const creator = await getCreator(creatorId)
             console.log(creator);
             channelName = creator.response.data.name
@@ -222,6 +240,7 @@ export default function Index() {
             duration: 3000,
             isClosable: true,
         })
+        localStorage.removeItem("recordingData")
         setLoading(false)
     }
     return (
@@ -250,7 +269,8 @@ export default function Index() {
                             {!selectedFile && <>
                                 <FormControl>
                                     <FormLabel>Upload Image Here</FormLabel>
-                                    <Input placeholder='Upload your Images' type='file' accept="image/*" h='80%' textAlign={'center'}
+                                    <Input placeholder='Upload your Images' type='file' accept="image/*" h='80%'
+                                           textAlign={'center'}
                                            onChange={onSelectFile}/>
                                 </FormControl>
                             </>}
@@ -288,29 +308,38 @@ export default function Index() {
                         </Stack>
                         <Stack flexDirection={"row"} justifyContent={"space-between"} h="50%" alignItems={"center"}
                                w="80%">
-                            <Box display={'flex'} flexDirection={'column'} justifyContent={'space-evenly'}
-                                 alignItems={'center'} _hover={{
-                                cursor: "pointer",
-                            }} onClick={() => {
-                                getAndNavigateToRoom();
-                            }}>
-                                <Text>Record the Video Using Huddle01</Text>
-                                <Image src={HuddleLogo} alt='Huddele Logo'/>
-                            </Box>
+                            {!huddleExists &&
+                                <>
+                                    <Box display={'flex'} flexDirection={'column'}
+                                         justifyContent={'space-evenly'} alignItems={'center'}
+                                         _hover={{cursor: "pointer"}} onClick={() => {
+                                        getAndNavigateToRoom();
+                                    }}>
+                                        <Text>Record the Video Using Huddle01</Text>
+                                        <Image src={HuddleLogo} alt='Huddele Logo'/>
+                                    </Box>
 
-                            <Box display={'flex'} flexDirection={'column'} justifyContent={'space-evenly'}
-                                 alignItems={'center'} rowGap={"1vh"}>
-                                <Text> Store a pre-recorded video on Lighthouse!</Text>
-                                <Input placeholder='My Video' type="file" accept="video/*" onChange={e => uploadFile(e)}/>
-                                {progressBarValue != 99 &&
-                                    <Progress value={progressBarValue} colorScheme='green' size={"md"} w="100%"/>}
-                                {progressBarValue == 99 && <Text>File Upload Successful!</Text>}
-                            </Box>
+                                    <Box display={'flex'} flexDirection={'column'} justifyContent={'space-evenly'}
+                                         alignItems={'center'} rowGap={"1vh"}>
+                                        <Text> Store a pre-recorded video on Lighthouse!</Text>
+                                        <Input placeholder='My Video' type="file" accept="video/*"
+                                               onChange={e => uploadFile(e)}/>
+                                        {progressBarValue != 99 &&
+                                            <Progress value={progressBarValue} colorScheme='green' size={"md"}
+                                                      w="100%"/>}
+                                        {progressBarValue == 99 && <Text>File Upload Successful!</Text>}
+                                    </Box>
+                                </>
+                            }
+                            {huddleExists &&
+                                <Text>Huddle Recording Link: {lightHouseLink}</Text>
+                            }
 
                         </Stack>
                         <Stack direction='row' justifyContent='center' h="8.5%">
                             <Box w='80%'>
-                                <Button isLoading={loading} type="submit" colorScheme="telegram" p={4} size="lg" fontSize={'2xl'}
+                                <Button isLoading={loading} type="submit" colorScheme="telegram" p={4} size="lg"
+                                        fontSize={'2xl'}
                                         h='80%' onClick={onSubmit}>
                                     Submit
                                 </Button>
